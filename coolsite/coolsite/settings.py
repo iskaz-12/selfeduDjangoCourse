@@ -22,10 +22,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-cyijmny_p^%q6a@7vdp@xf2ibbo15(0at$$gdh-qj1mpgc)zgc'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# UPD on 17.08.2023 - Lesson 3
+# Процесс отладки определяется именно в данном файле настроек settings.py
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
+DEBUG = False
+
+# UPD on 17.08.2023 - Lesson 3
+# Если DEBUG = False, то нужно настроить коллекцию ALLOWED_HOSTS
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
