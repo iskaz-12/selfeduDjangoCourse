@@ -7,7 +7,21 @@ from django.shortcuts import render, redirect
 # Создание функции представления
 # Название функции - произвольное
 def index(request):  # HttpRequest
-    return HttpResponse("Страница приложения women.")
+
+    # return HttpResponse("Страница приложения women.")
+
+    # UPD on 18.08.2023 - Lesson 6
+    # Нам нужно возвращать полноценную html-страницу, это можно делать следующим образом
+    return HttpResponse('''<!DOCTYPE html>
+    <html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+    
+    </body>
+    </html>''')
+    # НО это выносится за пределы приложения и организуется в виде шаблонов html-страниц
 
 
 # UPD on 17.08.2023 - Lesson 2
