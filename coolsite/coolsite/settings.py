@@ -10,6 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+# UPD on 17.08.2023 - Lesson 4
+import os
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,8 +29,8 @@ SECRET_KEY = 'django-insecure-cyijmny_p^%q6a@7vdp@xf2ibbo15(0at$$gdh-qj1mpgc)zgc
 # Процесс отладки определяется именно в данном файле настроек settings.py
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
 # UPD on 17.08.2023 - Lesson 3
 # Если DEBUG = False, то нужно настроить коллекцию ALLOWED_HOSTS
@@ -87,6 +90,9 @@ WSGI_APPLICATION = 'coolsite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# UPD on 17.08.2023 - Lesson 4
+# Здесь хранятся текущие настройки базы данных
+# Для работы с другими СУБД (PostgreSQL, MySQL и т.д.) здесь нужно подключить нужный сервер Django
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -135,3 +141,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# UPD on 17.08.2023 - Lesson 4
+# Задаём MEDIA_ROOT и MEDIA_URL
+# BASE_DIR - текущая рабочая папка проекта
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# К URL графических файлов будет добавляться префикс media
+MEDIA_URL = '/media/'

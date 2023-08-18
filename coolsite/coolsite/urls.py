@@ -14,9 +14,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
+from coolsite import settings
 from women.views import *
 
 # UPD on 17.08.2023 - Lesson 2
@@ -42,6 +44,15 @@ urlpatterns = [
     # UPD on 17.08.2023
     # path('cats/', categories),  # https://127.0.0.1:8000/cats/
 ]
+
+# UPD on 17.08.2023 - Lesson 4
+# В процессе отладки сервера нужно сэмулировать работу реального сервера для получения ранее загруженных файлов
+# и передачи их приложению
+# На реальных серверах, как правило, данный процесс уже настроен
+if settings.DEBUG:
+    # Добавляем маршрут к графическим загруженным файлам (чтобы веб-сервер находил их и отображал на html-странице)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 # UPD on 17.08.2023 - Lesson 3
 # Переопределяем специальный обработчик для страницы 404 (handler404 - встроен в Django)
