@@ -1,0 +1,20 @@
+<!--
+UPD on 21.08.2023 - Lesson 12
+-->
+<!--
+Создаём шаблон для отображения статьи
+-->
+{% extends 'women/base.html' %}
+
+{% block content %}
+<h1>{{post.title}}</h1>
+
+{% if post.photo %}
+<p><img class="img-article-left" src="{{post.photo.url}}"></p>
+{% endif %}
+
+<!--
+Фильтр linebreaks добавляет теги абзацев в статью
+-->
+{{post.content|linebreaks}}
+{% endblock %}

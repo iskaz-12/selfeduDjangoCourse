@@ -1,0 +1,32 @@
+<!--
+UPD on 21.08.2023 - Lesson 11
+-->
+<!--
+ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: ОТОБРАЖЕНИЕ ПУНКТОВ МЕНЮ С ПОМОЩЬЮ ПОЛЬЗОВАТЕЛЬСКОГО ТЕГА
+-->
+{% for m in menu %}
+	{% if not forloop.last %}
+				<!--
+				UPD on 21.08.2023 - Lesson 8
+				-->
+			<!--
+				<li><a href="#">{{m.title}}</a></li>
+				-->
+				<li><a href="{% url m.url_name %}">{{m.title}}</a></li>
+	{% else %}
+                <!--
+                # - в данном случае "заглушка"
+                -->
+				<!--
+				UPD on 21.08.2023 - Lesson 8
+				-->
+				<!--
+				Вместо имени ссылки пункта меню подставляется конкретный маршрут
+				-->
+				<!--
+			<li class="last"><a href="#">{{m.title}}</a></li>
+			-->
+				<li class="last"><a href="{% url m.url_name %}">{{m.title}}</a></li>
+
+	{% endif %}
+{% endfor %}

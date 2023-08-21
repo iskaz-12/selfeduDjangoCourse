@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 # UPD on 19.08.2023 - Lesson 6
 # Выполним чтение данных из таблицы women БД и отобразим на главной странице
@@ -67,7 +67,9 @@ def index(request):  # HttpRequest
 
     # UPD on 21.08.2023 - Lesson 9
     # Получаем список категорий
-    cats = Category.objects.all()
+    # UPD on 21.08.2023 - Lesson 11
+    # Убираем cats
+    # cats = Category.objects.all()
 
     # UPD on 21.08.2023 - Lesson 8
     # Переформатируем функцию представления index
@@ -75,8 +77,9 @@ def index(request):  # HttpRequest
     context = {
         'posts': posts,
         # UPD on 21.08.2023 - Lesson 9
-        'cats': cats,
-        'menu': menu,
+        # UPD on 21.08.2023 - Lesson 11
+        # 'cats': cats,
+        # 'menu': menu,
         'title': 'Главная страница',
         # UPD on 21.08.2023 - Lesson 9
         # cat_selected = 0 - на главной странице отображаются все записи
@@ -178,8 +181,28 @@ def pageNotFound(request, exception):
 
 # UPD on 21.08.2023 - Lesson 8
 # Функция-заглушка (пока) для конкретной статьи сайта
+"""
 def show_post(request, post_id):
     return HttpResponse(f"Отображение статьи с id = {post_id}")
+"""
+
+
+# UPD on 21.08.2023 - Lesson 12
+# Меняем функцию отображения статей для использования слагов в url
+def show_post(request, post_id):
+    # Функция get_objects_or_404() возвращает запись по id или страницу 404, если запись не найдена
+    post = get_object_or_404(Women, pk=post_id)
+
+    context = {
+        'post': post,
+        'menu': menu,
+        'title': post.title,
+        # UPD on 21.08.2023 - Lesson 12
+        # 'cat_selected': 1,
+        'cat_selected': post.cat_id,
+    }
+
+    return render(request, 'women/post.html', context=context)
 
 
 # UPD on 21.08.2023 - Lesson 9
@@ -196,7 +219,18 @@ def show_category(request, cat_id):
 def show_category(request, cat_id):
     # Выбираем посты, соответствующие текущей рубрике
     posts = Women.objects.filter(cat_id=cat_id)
-    cats = Category.objects.all()
+
+    # UPD on 21.08.2023 - Lesson 11
+    # Уберём дублирование данной функции в index и show_category с помощью пользовательских тегов
+    # Django позволяет использовать два вида пользовательских тегов:
+    # simple tags – простые теги;
+    # inclusion tags – включающие теги.
+    # Все теги в Django принято располагать в спец. подкаталоге templatetags
+    # Там должен быть файл __init.py__ (чтобы каталог считался пакетом)
+    # Создаём файл women_tags.py
+    # UPD on 21.08.2023 - Lesson 11
+    # Убираем cats
+    # cats = Category.objects.all()
 
     # Если категория пустая, то будем отображать страницу 404
     if len(posts) == 0:
@@ -204,8 +238,9 @@ def show_category(request, cat_id):
 
     context = {
         'posts': posts,
-        'cats': cats,
-        'menu': menu,
+        # UPD on 21.08.2023 - Lesson 11
+        # 'cats': cats,
+        # 'menu': menu,
         'title': 'Отображение по рубрикам',
         'cat_selected': cat_id,
     }

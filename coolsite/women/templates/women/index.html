@@ -88,7 +88,15 @@ UPD on 20.08.2023 - Lesson 7
          <p class="first">Категория: {{p.cat}}</p>
          <p class="last">Дата: {{p.time_update|date:"d-m-Y H:i:s"}}</p>
 </div>
-
+<!--
+UPD on 21.08.2023 - Lesson 10
+-->
+				<!--
+				Выводим фото на сайте
+				-->
+				{% if p.photo %}
+         <p><img class="img-article-left thumb" src="{{p.photo.url}}"></p>
+{% endif %}
 				<h2>{{p.title}}</h2>
                 <!--
                 UPD on 20.08.2023 - Lesson 7

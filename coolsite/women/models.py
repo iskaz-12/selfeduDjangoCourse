@@ -11,6 +11,7 @@ from django.urls import reverse
 # Поле id уже присутствует в классе Model, его доопределять не нужно
 # По умолчанию, последовательность полей в таблице будет такой же, как в модели
 class Women(models.Model):
+    """
     # UPD on 17.08.2023 - Lesson 4
     # Через классы ...Field определяются поля таблицы в базе данных
     title = models.CharField(max_length=255)
@@ -42,6 +43,26 @@ class Women(models.Model):
     # python manage.py migrate
     # В реальных проектах рекомендуется продумывать структуру БД заранее
     cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True)
+    """
+
+    # UPD on 21.08.2023 - Lesson 10
+    # Устанавливаем параметр verbose_name
+    title = models.CharField(max_length=255, verbose_name="Заголовок")
+    # UPD on 21.08.2023 - Lesson 12
+    # Добавляем в модель Women слаг
+    # unique=True - слаг должен быть уникальным
+    # Нужно внести изменения в БД
+    # python manage.py makemigrations
+    # Возникает предупреждение, что slug не может быть пустым
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
+    content = models.TextField(blank=True, verbose_name="Текст статьи")
+    photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
+    time_create = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
+    time_update = models.DateTimeField(auto_now=True, verbose_name="Время изменения")
+    is_published = models.BooleanField(default=True, verbose_name="Публикация")
+    # UPD on 21.08.2023 - Lesson 12
+    # cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, verbose_name="Категории")
+    cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name="Категории")
 
     # UPD on 17.08.2023 - Lesson 4
     # Чтобы создать таблицу в БД нужно создать и выполнить миграции
@@ -184,6 +205,27 @@ class Women(models.Model):
     def get_absolute_url(self):
         return reverse('post', kwargs={'post_id': self.pk})
 
+    # UPD on 21.08.2023 - Lesson 10
+    # Если использовать не get_absolute_url, то в админ-панели не будет кнопки "Смотреть на сайте"
+    ''''
+    def get_absolute_url2(self):
+        return reverse('post', kwargs={'post_id': self.pk})
+    '''
+
+    # UPD on 21.08.2023 - Lesson 10
+    # Пусть в админ-панели будет отображаться не Women, а Известные женщины
+    # Создаём вложенный класс Meta (встроенный в Django)
+    # Получается Известные женщиныs
+    # Добавляем verbose_name_plural
+    # Упорядочим статьи по времени создания и заголовку (ordering)
+    # По умолчанию сортировка применяется и к записям из модели Women
+    class Meta:
+        verbose_name = 'Известные женщины'
+        verbose_name_plural = 'Известные женщины'
+        # '-' - сортировка в обратном порядке
+        # ordering = ['time_create', 'title']
+        ordering = ['-time_create', 'title']
+
 
 # UPD on 21.08.2023 - Lesson 9
 # Нужно добавить новую таблицу category в БД и связать с таблицей Women
@@ -212,7 +254,16 @@ class Women(models.Model):
 # Поле-id добавится автоматически
 class Category(models.Model):
     # db_index=True - поле id будет проиндексировано (более быстрый поиск)
-    name = models.CharField(max_length=100, db_index=True)
+    # name = models.CharField(max_length=100, db_index=True)
+
+    # UPD on 21.08.2023 - Lesson 10
+    # Изменения с verbose_name желательно внести в БД с помощью миграций
+    # python manage.py makemigrations
+    # python manage.py migrate
+    # Далее работаем с админ-панелью
+    # Веб-сервер Django автоматически загружает фото в нужный каталог
+    # Загрузим все фото
+    name = models.CharField(max_length=100, db_index=True, verbose_name="Категория")
 
     def __str__(self):
         return self.name
@@ -221,6 +272,12 @@ class Category(models.Model):
     # Добавляем функцию для формирования ссылок
     def get_absolute_url(self):
         return reverse('category', kwargs={'cat_id': self.pk})
+
+    # UPD on 21.08.2023 - Lesson 10
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+        ordering = ['id']
 
 # UPD on 21.08.2023 - Lesson 9
 # Добавим записи в таблицу category

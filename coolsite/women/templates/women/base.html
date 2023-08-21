@@ -53,6 +53,13 @@ UPD on 20.08.2023 - Lesson 7
 -->
 
 {% load static %}
+<!--
+UPD on 21.08.2023 - Lesson 11
+-->
+<!--
+Загружаем файл пользовательских тегов
+-->
+{% load women_tags %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -85,16 +92,26 @@ UPD on 20.08.2023 - Lesson 7
 				<li class="logo"><a href="/"><div class="logo"></div></a></li>
 				-->
 					<li class="logo"><a href="{% url 'home' %}"><div class="logo"></div></a></li>
+				<!--
+				UPD on 21.08.2023 - Lesson 11
+				-->
+				<!--
+				ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: СОЗДАНИЕ ПОЛЬЗОВАТЕЛЬСКИХ ТЕГОВ ДЛЯ ОТОБРАЖЕНИЯ МЕНЮ
+				-->
+				<!--
 {% for m in menu %}
 	{% if not forloop.last %}
+	-->
 				<!--
 				UPD on 21.08.2023 - Lesson 8
 				-->
 			<!--
 				<li><a href="#">{{m.title}}</a></li>
 				-->
+				<!--
 				<li><a href="{% url m.url_name %}">{{m.title}}</a></li>
 	{% else %}
+	-->
                 <!--
                 # - в данном случае "заглушка"
                 -->
@@ -107,10 +124,14 @@ UPD on 20.08.2023 - Lesson 7
 				<!--
 			<li class="last"><a href="#">{{m.title}}</a></li>
 			-->
+				<!--
 				<li class="last"><a href="{% url m.url_name %}">{{m.title}}</a></li>
 
 	{% endif %}
 {% endfor %}
+-->
+				{% show_menu %}
+
 			</ul>
 			<div class="clear"></div>
 		</div>
@@ -121,6 +142,44 @@ UPD on 20.08.2023 - Lesson 7
 <tr>
 <!-- Sidebar слева -->
 	<td valign="top" class="left-chapters">
+		<!--
+		UPD on 21.08.2023 - Lesson 11
+		-->
+		<!--
+		Используем простой пользовательский тег
+		-->
+		<!--
+
+		-->
+		<!--
+		Как перебрать список в цикле for?
+		Нужно содержимое тега перенести в переменную
+		as <имя_переменной> - возвращает ссылку на данные тега
+		-->
+		<!--
+
+		-->
+		<!--
+		{% getcats as categories %}
+		-->
+		<!--
+		{% getcats %}
+		-->
+		<!--
+		UPD on 21.08.2023 - Lesson 11
+		-->
+		<!--
+		Передаем параметр тегу
+		Без пробелов до и после '='
+		Можно передавать без названия параметра
+		-->
+		<!--
+		{% getcats filter=1 %}
+		-->
+		<!--
+		{% getcats 2 %}
+		-->
+
 	<ul id="leftchapters">
 		<!--
 		UPD on 21.08.2023 - Lesson 9
@@ -146,13 +205,39 @@ UPD on 20.08.2023 - Lesson 7
                    <li><a href="{% url 'home' %}">Все категории</a></li>
 {% endif %}
 
-{% for c in cats %}
-         {% if c.pk == cat_selected %}
-                   <li class="selected">{{c.name}}</li>
-         {% else %}
-                   <li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
-         {% endif %}
-{% endfor %}
+		<!--
+		UPD on 21.08.2023 - Lesson 11
+		-->
+		<!--
+		Список берётся из тега
+		-->
+		<!--
+
+		-->
+
+		<!--
+		UPD on 21.08.2023 - Lesson 11
+		-->
+		<!--
+		Использованием тегов сохраняет ссылки на текущих категориях
+		-->
+		<!--
+
+		-->
+		<!--
+		Передаём параметры во включенный тег
+		-->
+		<!--
+
+		-->
+		<!--
+
+		-->
+		<!--
+		Если сортировка категорий не нужна, передаём 1 параметр
+		-->
+		{% show_categories cat_selected=cat_selected %}
+
 		<li class="share">
 		<p>Наш канал</p>
 		<a class="share-yt" href="https://www.youtube.com/channel/UClJzWfGWuGJL2t-3dYKcHTA/playlists" target="_blank" rel="nofollow"></a>

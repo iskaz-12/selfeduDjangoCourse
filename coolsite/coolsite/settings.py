@@ -54,6 +54,14 @@ INSTALLED_APPS = [
     # 'women'
     # более удобный вариант
     'women.apps.WomenConfig'
+
+    # UPD on 21.08.2023 - Lesson 10
+    # Переименование нормально сработает, только если
+    # в settings.py приложение зарегистрировано с использованием WomenConfig
+    # ДОПОЛНИТЕЛЬНО НУЖНО В apps.py В WomenConfig УСТАНОВИТЬ ФЛАГ default = False
+    # 'women',
+
+
 ]
 
 MIDDLEWARE = [
@@ -125,7 +133,20 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# UPD on 21.08.2023 - Lesson 10 (работа с админ-панелью)
+# 127.0.0.1:8000/admin/
+# Попробуем русифицировать админ-панель
+# LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
+
+# UPD on 21.08.2023 - Lesson 10
+# Необходимо создать суперпользователя
+# python manage.py createsuperuser
+# root  # имя пользователя
+# root@coolsite.ru  # адрес эл.почты
+# пароль стандартный
+# y
+# 2 зарегистрированных приложения: группы и пользователи
 
 TIME_ZONE = 'UTC'
 
