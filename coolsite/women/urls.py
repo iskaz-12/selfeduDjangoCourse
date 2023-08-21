@@ -6,6 +6,7 @@ from django.urls import path, re_path
 from .views import *
 
 # UPD on 17.08.2023 - Lesson 3
+'''
 urlpatterns = [
     # path('', index),    # https://127.0.0.1:8000/
 
@@ -23,4 +24,26 @@ urlpatterns = [
 
     # (?P<...>) - синтаксис именованной группы (year - именованный параметр для части шаблона)
     re_path(r'^archive/(?P<year>[0-9]{4})/', archive),
+]
+'''
+
+# UPD on 19.08.2023 - Lesson 6
+# Меняем url-адреса
+urlpatterns = [
+    # UPD on 21.08.2023 - Lesson 8
+    path('', index, name='home'),
+    # path('home/', index, name='home'),
+    path('about/', about, name='about'),
+    # UPD on 21.08.2023 - Lesson 8
+    # Добавляем пути пунктов меню
+    path('addpage/', addpage, name='add_page'),
+    path('contact/', contact, name='contact'),
+    path('login/', login, name='login'),
+    # UPD on 21.08.2023 - Lesson 8
+    # Создание динамических url-ссылок на уровне шаблонов
+    # Добавляем ссылки на статьи
+    path('post/<int:post_id>/', show_post, name='post'),
+    # UPD on 21.08.2023 - Lesson 9
+    # Добавляем ссылки на категории
+    path('category/<int:cat_id>/', show_category, name='category'),
 ]

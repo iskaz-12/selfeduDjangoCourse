@@ -1,6 +1,7 @@
 # UPD on 17.08.2023 - Lesson 4
 # Модуль models содержит базовые классы моделей, на основе которых можно создавать свои модели БД
 from django.db import models
+from django.urls import reverse
 
 
 # Create your models here.
@@ -26,6 +27,21 @@ class Women(models.Model):
     time_update = models.DateTimeField(auto_now=True)
     # default - значение поля по умолчанию
     is_published = models.BooleanField(default=True)
+
+    # UPD on 21.08.2023 - Lesson 9
+    # Внешний ключ (будет называться cat_id)
+    # Можно передавать модель не как строку, но тогда класс Category должен быть определён в коде ранее
+    # cat = models.ForeignKey('Category', on_delete=models.PROTECT)
+    # cat = models.ForeignKey(Category, on_delete=models.PROTECT)
+    # Нужно осуществить миграцию
+    # python manage.py makemigrations
+    # Первоначально возникает ошибка, т.к. нет таблицы Category
+    # 2 # выбираем вторую опцию
+    # null=True - разрешаем установку NULL в существующие записи
+    # python manage.py makemigrations
+    # python manage.py migrate
+    # В реальных проектах рекомендуется продумывать структуру БД заранее
+    cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True)
 
     # UPD on 17.08.2023 - Lesson 4
     # Чтобы создать таблицу в БД нужно создать и выполнить миграции
@@ -79,7 +95,8 @@ class Women(models.Model):
     # w3.title = 'Джулия Робертс'
     # w3.content = 'Биография Джулии Робертс'
     # w3.save()
-    # Таким образом, благодаря ленивым запросам можно наполнять записи данными в разном порядке, а только потом сохранять
+    # Таким образом, благодаря ленивым запросам можно
+    # наполнять записи данными в разном порядке, а только потом сохранять
     # Каждый класс модели содержит спец. статический объект objects
     # # objects
     # Этот объект берётся из базового класса модели и представляет собой ссылку на спец.класс manager
@@ -159,3 +176,87 @@ class Women(models.Model):
     # wd = Women.objects.filter(pk__gte=4)
     # wd
     # wd.delete()   # delete - метод удаления (были удалены 2 записи)
+
+    # UPD on 21.08.2023 - Lesson 8
+    # Функция для динамического формирования url-адреса для конкретной записи
+    # reverse берёт адрес из urls.py
+    # Для самостоятельных ссылок на элементы сайта, не связанные с БД, лучше использовать тег url
+    def get_absolute_url(self):
+        return reverse('post', kwargs={'post_id': self.pk})
+
+
+# UPD on 21.08.2023 - Lesson 9
+# Нужно добавить новую таблицу category в БД и связать с таблицей Women
+# Фреймворк Django имеет три специальных класса для организации связей:
+# ForeignKey – для связей Many to One (поля отношений);
+# ManyToManyField – для связей Many to Many (многие ко многим);
+# OneToOneField – для связей One to One (один к одному).
+# Мы будем использовать ForeignKey
+# ForeignKey(<ссылка на первичную модель>, on_delete=<ограничения при удалении записей из первичной модели>)
+# В нашем случае category - первичная модель, women - вторичная
+# В свою очередь, опция on_delete может принимать следующие значения:
+# models.CASCADE – при удалении записи из первичной модели (у нас это таблица Category) происходит
+# удаление всех записей из вторичной модели (Women), связанных с удаляемой категорией;
+# models.PROTECT – запрещает удаление записи из первичной модели, если она
+# используется во вторичной (выдает исключение);
+# models.SET_NULL – при удалении записи первичной модели устанавливает значение
+# foreign key в NULL у соответствующих записей вторичной модели;
+# models.SET_DEFAULT – то же самое, что и SET_NULL, только вместо значения NULL
+# устанавливает значение по умолчанию, которое должно быть определено через класс ForeignKey;
+# models.SET() – то же самое, только устанавливает пользовательское значение;
+# models.DO_NOTHING – удаление записи в первичной модели не вызывает никаких действий у вторичных моделей.
+
+
+# UPD on 21.08.2023 - Lesson 9
+# Создаём новый класс-модель Category
+# Поле-id добавится автоматически
+class Category(models.Model):
+    # db_index=True - поле id будет проиндексировано (более быстрый поиск)
+    name = models.CharField(max_length=100, db_index=True)
+
+    def __str__(self):
+        return self.name
+
+    # UPD on 21.08.2023 - Lesson 9
+    # Добавляем функцию для формирования ссылок
+    def get_absolute_url(self):
+        return reverse('category', kwargs={'cat_id': self.pk})
+
+# UPD on 21.08.2023 - Lesson 9
+# Добавим записи в таблицу category
+# python manage.py shell
+# from women.models import *
+# Category.objects.create(name='Актрисы')
+# Category.objects.create(name='Певицы')
+# Заполним поле cat_id таблицы women
+# w_list = Women.objects.all()
+# w_list.update(cat_id=1)
+# Классы моделей и их экземпляры
+# Women.title   # ссылка на объект (без конкретной информации)
+# w1 = Women(title='t1', content='c1', cat_id=1)  # title - строка, cat_id - ссылка на экземпляр класса Category
+# Это всё делает конструктор класса Model
+# type(w1.title)    # <class 'str'>
+# w1.title  # 't1'
+# type(w1.cat)  # <class 'women.models.Category'>
+# w1.pk
+# print(w1.id, w1.time_create, w1.time_update)  # None None None
+# from django.db import connection
+# connection.queries
+# exit()
+# Перезапустим консоль Django
+# python manage.py shell
+# from women.models import *
+# w1 = Women(title='t1', content='c1', cat_id=1)
+# from django.db import connection
+# connection.queries    # []
+# w1.cat    # <Category: Актрисы>
+# connection.queries    # [{'sql': 'SELECT "women_category"."id", "women_category"."name" FROM "women_category"
+# WHERE "women_category"."id" = 1 LIMIT 21', 'time': '0.000'}]
+# Django обращается к БД только при необходимости
+# w2 = Women.objects.get(pk=2)
+# connection.queries
+# w2.title
+# w2.cat
+# connection.queries
+# w2.cat.name   # 'Актрисы'
+# exit()

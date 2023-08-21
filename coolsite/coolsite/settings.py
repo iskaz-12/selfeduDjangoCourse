@@ -68,6 +68,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'coolsite.urls'
 
+# UPD on 19.08.2023 - Lesson 6
+# Здесь указаны пути поиска шаблонов (по умолчанию Django ищет подкаталоги templates)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -135,7 +137,28 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# UPD on 20.08.2023 - Lesson 7
+# STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+# UPD on 20.08.2023 - Lesson 7
+# К шаблонам в Django можно подключать статические файлы
+# В режиме отладки Django ищет статические файлы во всех подкаталогах static
+# НО в режиме эксплуатации реальный веб-сервер будет брать все статические файлы из общей папки проекта static
+# Это можно осуществить с помощью команды
+# python manage.py collectstatic
+# Для корректной работы нужно определить 3 константы в settings.py:
+# STATIC_URL – префикс URL-адреса для статических файлов;
+# STATIC_ROOT – путь к общей статической папке, используемой реальным веб-сервером;
+# STATICFILES_DIRS – список дополнительных (нестандартных) путей к статическим файлам,
+# используемых для сбора и для режима отладки.
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = []
+
+# UPD on 20.08.2023 - Lesson 7
+# Создаём папку static и подкаталог women (аналогично каталогу templates)
+# Также создаём подкаталог css (для каскадных таблиц стилей), js (для файлов JavaScript)
+# и images (для хранения изображений)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

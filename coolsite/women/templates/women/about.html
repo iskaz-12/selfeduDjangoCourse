@@ -1,0 +1,45 @@
+{% extends 'women/base.html' %}
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    -->
+    <!--
+    UPD on 19.08.2023 - Lesson 6
+    В html-файлах можно прописывать спец. конструкции, например, для данных из БД
+    -->
+    <!--
+    <title>О сайте</title>
+    -->
+<!--
+    <title>{{ title }}</title>
+</head>
+<body>
+<h1>О сайте</h1>-->
+
+<!--
+UPD on 19.08.2023
+-->
+<!--
+<ul>
+{% for m in menu %}
+<li>{{m}}</li>
+{% endfor %}
+</ul>
+
+</body>
+</html>
+-->
+
+<!--
+UPD on 19.08.2023 - Lesson 6
+-->
+<!--
+Наследуем и расширяем родительский шаблон
+-->
+
+{% block content %}
+<h1>{{title}}</h1>
+<p>Содержимое страницы о сайте
+{% endblock %}

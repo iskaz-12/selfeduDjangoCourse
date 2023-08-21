@@ -1,0 +1,146 @@
+{% extends 'women/base.html' %}
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    -->
+    <!--
+    UPD on 19.08.2023 - Lesson 6
+    В html-файлах можно прописывать спец. конструкции, например, для данных из БД
+    -->
+    <!--
+    <title>Главная страница</title>
+    -->
+<!--
+    <title>{{ title }}</title>
+</head>
+<body>
+-->
+
+<!--
+UPD on 19.08.2023
+-->
+<!--
+<ul>
+{% for m in menu %}
+<li>{{m}}</li>
+{% endfor %}
+</ul>
+
+</body>
+</html>
+-->
+
+<!--
+UPD on 19.08.2023 - Lesson 6
+-->
+<!--
+Наследуем и расширяем родительский шаблон
+-->
+<!--
+
+<h1>{{title}}</h1>
+-->
+<!--
+<p>Содержимое главной страницы
+-->
+
+<!--
+<ul>
+-->
+    <!--
+    Коллекция posts содержит объекты модели Women
+    -->
+<!--
+         {% for p in posts %}
+         <li>
+                   <h2>{{p.title}}</h2>
+                   <p>{{p.content}}</p>
+                   <hr>
+         </li>
+         {% endfor %}
+</ul>
+
+
+-->
+
+<!--
+UPD on 20.08.2023 - Lesson 7
+-->
+<!--
+Новый вариант содержимого файла
+-->
+<!--
+Пришлось убрать объявления блоков из предыдущего содержимого файла, т.к. возникали ошибки
+-->
+
+{% block content %}
+<ul class="list-articles">
+	{% for p in posts %}
+	<!--
+	UPD on 21.08.2023 - Lesson 9
+	-->
+	<!--
+	Добавляем название категории и время обновления
+	-->
+			<li><div class="article-panel">
+         <p class="first">Категория: {{p.cat}}</p>
+         <p class="last">Дата: {{p.time_update|date:"d-m-Y H:i:s"}}</p>
+</div>
+
+				<h2>{{p.title}}</h2>
+                <!--
+                UPD on 20.08.2023 - Lesson 7
+                -->
+                <!--
+                Пока убираем данный фрагмент
+                -->
+                <!--
+	{% autoescape on %}
+	{{p.content|linebreaks|truncatewords:50}}
+	{% endautoescape %}
+	-->
+				<!--
+				Существуют фильтры в Django для управления контентом. Например, linebreaks, truncatewords
+				-->
+                <!--
+                <p>{{p.content}}</p>
+                -->
+				<!--
+				<p>{{p.content|linebreaks}}</p>
+				-->
+				<!--
+				<p>{{p.content|linebreaks|truncatewords:50}}</p>
+				-->
+				<!--
+				Django автоматически экранирует теги в тексте, но есть тег autoescape
+				-->
+				<!--
+
+				-->
+				{% autoescape on %}
+				{{p.content|linebreaks|truncatewords:50}}
+				{% endautoescape %}
+			<div class="clear"></div>
+				<!--
+				UPD on 21.08.2023 - Lesson 8
+				-->
+				<!--
+				Есть 2 распространённых способа динамической обработки ссылок в теге url
+				-->
+				<!--
+			<p class="link-read-post"><a href="#">Читать пост</a></p>
+			-->
+				<!--
+				<p class="link-read-post"><a href="{% url 'post' p.pk %}">Читать пост</a></p>
+				-->
+				<!--
+				Лучше формировать динамические url-адреса, связанные с записями БД
+				Функцию get_absolute_url вызывать самостоятельно не нужно
+				-->
+				<p class="link-read-post"><a href="{{ p.get_absolute_url }}">Читать пост</a></p>
+			</li>
+	{% endfor %}
+</ul>
+{% endblock %}
