@@ -42,8 +42,14 @@ urlpatterns = [
     # UPD on 21.08.2023 - Lesson 8
     # Создание динамических url-ссылок на уровне шаблонов
     # Добавляем ссылки на статьи
-    path('post/<int:post_id>/', show_post, name='post'),
+    # UPD on 22.08.2023 - Lesson 12
+    # Пусть в url отображается слаг статьи
+    # path('post/<int:post_id>/', show_post, name='post'),
+    path('post/<slug:post_slug>/', show_post, name='post'),
     # UPD on 21.08.2023 - Lesson 9
     # Добавляем ссылки на категории
-    path('category/<int:cat_id>/', show_category, name='category'),
+    # path('category/<int:cat_id>/', show_category, name='category'),
+    # UPD on 22.08.2023 - Lesson 12
+    # ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: ДОБАВИТЬ ИСПОЛЬЗОВАНИЕ СЛАГОВ В ОТОБРАЖЕНИЕ URL-АДРЕСОВ КАТЕГОРИЙ
+    path('category/<slug:cat_slug>/', show_category, name='category'),
 ]

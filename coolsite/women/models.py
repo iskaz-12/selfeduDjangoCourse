@@ -54,13 +54,15 @@ class Women(models.Model):
     # Нужно внести изменения в БД
     # python manage.py makemigrations
     # Возникает предупреждение, что slug не может быть пустым
+    # 2
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
     content = models.TextField(blank=True, verbose_name="Текст статьи")
     photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
     time_create = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
     time_update = models.DateTimeField(auto_now=True, verbose_name="Время изменения")
     is_published = models.BooleanField(default=True, verbose_name="Публикация")
-    # UPD on 21.08.2023 - Lesson 12
+    # UPD on 22.08.2023 - Lesson 12
+    # Нужно удалить все миграции, чтобы перестроить БД
     # cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, verbose_name="Категории")
     cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name="Категории")
 
@@ -202,15 +204,24 @@ class Women(models.Model):
     # Функция для динамического формирования url-адреса для конкретной записи
     # reverse берёт адрес из urls.py
     # Для самостоятельных ссылок на элементы сайта, не связанные с БД, лучше использовать тег url
+    """
     def get_absolute_url(self):
         return reverse('post', kwargs={'post_id': self.pk})
+    """
+
+    # UPD on 22.08.2023 - Lesson 12
+    # Формируем ссылку на основе слага
+    # При этом мы не вносим изменений в шаблон, т.к. он формируется на основе get_absolute_url
+    # Django автоматически защищает такие адреса от sql-инъекций
+    def get_absolute_url(self):
+        return reverse('post', kwargs={'post_slug': self.slug})
 
     # UPD on 21.08.2023 - Lesson 10
     # Если использовать не get_absolute_url, то в админ-панели не будет кнопки "Смотреть на сайте"
-    ''''
+    """
     def get_absolute_url2(self):
         return reverse('post', kwargs={'post_id': self.pk})
-    '''
+    """
 
     # UPD on 21.08.2023 - Lesson 10
     # Пусть в админ-панели будет отображаться не Women, а Известные женщины
@@ -264,14 +275,34 @@ class Category(models.Model):
     # Веб-сервер Django автоматически загружает фото в нужный каталог
     # Загрузим все фото
     name = models.CharField(max_length=100, db_index=True, verbose_name="Категория")
+    # UPD on 22.08.2023 - Lesson 12
+    # python manage.py makemigrations
+    # python manage.py migrate
+    # Нужно удалить прежнюю версию БД, чтобы миграция применилась
+    # python manage.py migrate
+    # Нужно заново создать суперпользователя для админ-панели
+    # python manage.py createsuperuser
+    # root  # имя пользователя
+    # root@coolsite.ru  # адрес эл.почты
+    # Создание пароля
+    # y
+    # python manage.py runserver
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
     def __str__(self):
         return self.name
 
     # UPD on 21.08.2023 - Lesson 9
     # Добавляем функцию для формирования ссылок
+    """
     def get_absolute_url(self):
         return reverse('category', kwargs={'cat_id': self.pk})
+    """
+
+    # UPD on 22.08.2023 - Lesson 12
+    # ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: ДОБАВИТЬ ИСПОЛЬЗОВАНИЕ СЛАГОВ В ОТОБРАЖЕНИЕ URL-АДРЕСОВ КАТЕГОРИЙ
+    def get_absolute_url(self):
+        return reverse('category', kwargs={'cat_slug': self.slug})
 
     # UPD on 21.08.2023 - Lesson 10
     class Meta:

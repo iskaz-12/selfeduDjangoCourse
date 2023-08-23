@@ -23,6 +23,10 @@ class WomenAdmin(admin.ModelAdmin):
     list_editable = ('is_published',)
     # Укажем поля, по которым сможем фильтровать список статей
     list_filter = ('is_published', 'time_create')
+    # UPD on 22.08.2023 - Lesson 12
+    # Добавляем автоматическое формирование слага на основе заголовка статьи
+    # Через админ-панель заполнила БД
+    prepopulated_fields = {"slug": ("title",)}
 
 
 # UPD on 21.08.2023 - Lesson 10
@@ -32,6 +36,10 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'name')
     # ',' обязательна, т.к. передаём кортеж
     search_fields = ('name',)
+    # UPD on 22.08.2023 - Lesson 12
+    # Пусть слаг автоматически формируется из названия категории
+    # prepopulated_fields - автоматическое заполнение одних полей на основе других
+    prepopulated_fields = {"slug": ("name",)}
 
 
 # UPD on 21.08.2023 - Lesson 10

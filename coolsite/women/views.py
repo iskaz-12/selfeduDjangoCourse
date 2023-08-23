@@ -1,6 +1,8 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
+# UPD on 22.08.2023 - Lesson 13
+from .forms import *
 # UPD on 19.08.2023 - Lesson 6
 # Выполним чтение данных из таблицы women БД и отобразим на главной странице
 from .models import *
@@ -155,11 +157,45 @@ def archive(request, year):
     return HttpResponse(f"<h1>Архив по годам</h1><p>{year}</p>")
 '''
 
-
 # UPD on 21.08.2023 - Lesson 8
 # Добавляем функции представления для пунктов меню сайта
+"""
 def addpage(request):
     return HttpResponse("Добавление статьи")
+"""
+
+
+# UPD on 22.08.2023 - Lesson 13
+# В Django существует 2 вида форм: связанные с моделью таблицы БД или независимые
+# Реализуем добавление статей на сайте с помощью независимой от модели формы
+# python manage.py runserver
+# Перепишем функцию addpage
+# UPD on 23.08.2023 - Lesson 13
+# Если не прошла проверка корректности данных, то возвращаем не пустую форму, а уже заполненную
+# Если ввести недопустимые значения в поля формы, Django выведет замечание на сайте
+def addpage(request):
+    # Добавляем переменную, ссылающуюся на экземпляр класса формы
+    # form = AddPostForm()
+    # Повторный показ формы (с заполненными данными)
+    if request.method == 'POST':
+        form = AddPostForm(request.POST)
+        # is_valid() - проверка корректности данных
+        if form.is_valid():
+            # отображение очищенных данных в консоли
+            # print(form.cleaned_data)
+            # Выполним добавление записи в БД
+            try:
+                Women.objects.create(**form.cleaned_data)
+                return redirect('home')
+            # Например, срабатывает при добавлении записи с существующим в БД слагом
+            except:
+                # Общая ошибка формы
+                form.add_error(None, 'Ошибка добавления поста')
+    # Первичный показ формы
+    else:
+        form = AddPostForm()
+    # return render(request, 'women/addpage.html', {'menu': menu, 'title': 'Добавление статьи'})
+    return render(request, 'women/addpage.html', {'form': form, 'menu': menu, 'title': 'Добавление статьи'})
 
 
 def contact(request):
@@ -186,9 +222,9 @@ def show_post(request, post_id):
     return HttpResponse(f"Отображение статьи с id = {post_id}")
 """
 
-
 # UPD on 21.08.2023 - Lesson 12
 # Меняем функцию отображения статей для использования слагов в url
+"""
 def show_post(request, post_id):
     # Функция get_objects_or_404() возвращает запись по id или страницу 404, если запись не найдена
     post = get_object_or_404(Women, pk=post_id)
@@ -203,6 +239,23 @@ def show_post(request, post_id):
     }
 
     return render(request, 'women/post.html', context=context)
+"""
+
+
+# UPD on 22.08.2023 - Lesson 12
+# Добавляем отображение слага в url
+def show_post(request, post_slug):
+    # Страница отображается по слагу
+    post = get_object_or_404(Women, slug=post_slug)
+
+    context = {
+        'post': post,
+        'menu': menu,
+        'title': post.title,
+        'cat_selected': post.cat_id,
+    }
+
+    return render(request, 'women/post.html', context=context)
 
 
 # UPD on 21.08.2023 - Lesson 9
@@ -212,10 +265,10 @@ def show_category(request, cat_id):
     return HttpResponse(f"Отображение категории с id = {cat_id}")
 '''
 
-
 # UPD on 21.08.2023 - Lesson 9
 # Меняем функцию для отображения категорий
 # Функции index и show_category нарушают принцип DRY, позже исправим это с использованием классов представления
+"""
 def show_category(request, cat_id):
     # Выбираем посты, соответствующие текущей рубрике
     posts = Women.objects.filter(cat_id=cat_id)
@@ -243,6 +296,29 @@ def show_category(request, cat_id):
         # 'menu': menu,
         'title': 'Отображение по рубрикам',
         'cat_selected': cat_id,
+    }
+
+    return render(request, 'women/index.html', context=context)
+"""
+
+
+# UPD on 22.08.2023 - Lesson 12
+# ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: ДОБАВИТЬ ИСПОЛЬЗОВАНИЕ СЛАГОВ В ОТОБРАЖЕНИЕ URL-АДРЕСОВ КАТЕГОРИЙ
+def show_category(request, cat_slug):
+    # Находим id по слагу из category
+    cat_id = Category.objects.get(slug=cat_slug).pk
+
+    # Выбираем посты, соответствующие текущей рубрике
+    posts = Women.objects.filter(cat_id=cat_id)
+
+    # Если категория пустая, то будем отображать страницу 404
+    if len(posts) == 0:
+        raise Http404()
+
+    context = {
+        'posts': posts,
+        'title': 'Отображение по рубрикам',
+        'cat_selected': cat_slug,
     }
 
     return render(request, 'women/index.html', context=context)

@@ -1,0 +1,79 @@
+<!--
+UPD on 22.08.2023 - Lesson 13
+-->
+{% extends 'women/base.html' %}
+
+{% block content %}
+<h1>{{title}}</h1>
+<!--
+<p>Содержимое страницы
+-->
+<!--
+UPD on 23.08.2023 - Lesson 13
+-->
+<!--
+Добавим форму
+В action указываем url обработки формы, в method - используемый метод передачи данных (post - для логина/пароля)
+-->
+<form action="{% url 'add_page' %}" method="post">
+    <!--
+    csrf-token обеспечивает защиту от CSRF-атак (подделка межсайтовых запросов)
+    -->
+    {% csrf_token %}
+    <!--
+    Отображаем поля формы через тег абзаца <p> (функция as_p())
+    -->
+    <!--
+    {{ form.as_p }}
+    -->
+    <!--
+    Изменим отображение формы в шаблоне
+    Можно использовать другие классы тегов
+    -->
+
+    <!--
+    Вместо {{ form.title }} Django сгенерировал поле ввода
+    -->
+    <!--
+    <p><label class="form-label" for="{{ form.title.id_for_label }}">{{form.title.label}}: </label>{{ form.title }}</p>
+    -->
+    <!--
+    Для отображения возможных ошибок
+    -->
+    <!--
+    <div class="form-error">{{ form.title.errors }}</div>
+    -->
+
+    <!--
+    Добавляем по аналогии отображение других полей в форме
+    -->
+    <!--
+    <p><label class="form-label" for="{{ form.slug.id_for_label }}">{{form.slug.label}}: </label>{{ form.slug }}</p>
+    <div class="form-error">{{ form.slug.errors }}</div>
+    <p><label class="form-label" for="{{ form.content.id_for_label }}">{{form.content.label}}: </label>{{ form.content }}</p>
+    <div class="form-error">{{ form.content.errors }}</div>
+    <p><label class="form-label" for="{{ form.is_published.id_for_label }}">{{form.is_published.label}}: </label>{{ form.is_published }}</p>
+    <div class="form-error">{{ form.is_published.errors }}</div>
+    <p><label class="form-label" for="{{ form.cat.id_for_label }}">{{form.cat.label}}: </label>{{ form.cat }}</p>
+    <div class="form-error">{{ form.cat.errors }}</div>
+    -->
+    <!--
+    Добавим отображение ошибок, не связанных с заполнением полей
+    -->
+    <div class="form-error">{{ form.non_field_errors }}</div>
+
+    <!--
+    Можно отображать все элементы формы с помощью цикла
+    -->
+    {% for f in form %}
+    <p><label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
+    <div class="form-error">{{ f.errors }}</div>
+    {% endfor %}
+
+    <!--
+    submit - отправка данных на сервер
+    -->
+    <button type="submit">Добавить</button>
+</form>
+
+{% endblock %}

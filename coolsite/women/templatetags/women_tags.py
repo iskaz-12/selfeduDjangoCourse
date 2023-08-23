@@ -40,8 +40,23 @@ def show_categories():
 
 # UPD on 21.08.2023 - Lesson 11
 # Передаём параметры в тег
+"""
 @register.inclusion_tag('women/list_categories.html')
 def show_categories(sort=None, cat_selected=0):
+    if not sort:
+        cats = Category.objects.all()
+    else:
+        cats = Category.objects.order_by(sort)
+
+    return {"cats": cats, "cat_selected": cat_selected}
+"""
+
+
+# UPD on 22.08.2023 - Lesson 12
+# ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: ДОБАВИТЬ ИСПОЛЬЗОВАНИЕ СЛАГОВ В ОТОБРАЖЕНИЕ URL-АДРЕСОВ КАТЕГОРИЙ
+# НА ВСЯКИЙ СЛУЧАЙ ПЕРЕДАЁМ В cat_selected ПО УМОЛЧАНИЮ ПУСТУЮ СТРОКУ
+@register.inclusion_tag('women/list_categories.html')
+def show_categories(sort=None, cat_selected=""):
     if not sort:
         cats = Category.objects.all()
     else:

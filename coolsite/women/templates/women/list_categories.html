@@ -7,8 +7,23 @@ UPD on 21.08.2023 - Lesson 11
 <!--
 
 -->
+<!--
 {% for c in cats %}
          {% if c.pk == cat_selected %}
+                   <li class="selected">{{c.name}}</li>
+         {% else %}
+                   <li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
+         {% endif %}
+{% endfor %}
+-->
+<!--
+UPD on 22.08.2023 - Lesson 12
+-->
+<!--
+ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: ДОБАВИТЬ ИСПОЛЬЗОВАНИЕ СЛАГОВ В ОТОБРАЖЕНИЕ URL-АДРЕСОВ КАТЕГОРИЙ
+-->
+{% for c in cats %}
+         {% if c.slug == cat_selected %}
                    <li class="selected">{{c.name}}</li>
          {% else %}
                    <li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
