@@ -31,12 +31,18 @@ urlpatterns = [
 # Меняем url-адреса
 urlpatterns = [
     # UPD on 21.08.2023 - Lesson 8
-    path('', index, name='home'),
+    # path('', index, name='home'),
+    # UPD on 23.08.2023 - Lesson 15
+    # Вызов as_view() связывает класс WomenHome с маршрутом
+    # python manage.py runserver    # TemplateDoesNotExist at / (не найден шаблон по умолчанию women/women_list.html)
+    path('', WomenHome.as_view(), name='home'),
     # path('home/', index, name='home'),
     path('about/', about, name='about'),
     # UPD on 21.08.2023 - Lesson 8
     # Добавляем пути пунктов меню
-    path('addpage/', addpage, name='add_page'),
+    # UPD on 23.08.2023 - Lesson 15
+    # path('addpage/', addpage, name='add_page'),
+    path('addpage/', AddPage.as_view(), name='add_page'),
     path('contact/', contact, name='contact'),
     path('login/', login, name='login'),
     # UPD on 21.08.2023 - Lesson 8
@@ -45,11 +51,19 @@ urlpatterns = [
     # UPD on 22.08.2023 - Lesson 12
     # Пусть в url отображается слаг статьи
     # path('post/<int:post_id>/', show_post, name='post'),
-    path('post/<slug:post_slug>/', show_post, name='post'),
+    # UPD on 23.08.2023 - Lesson 15
+    # path('post/<slug:post_slug>/', show_post, name='post'),
+    # AttributeError at /post/shakira/
+    path('post/<slug:post_slug>/', ShowPost.as_view(), name='post'),
+    # slug - переменная по умолчанию при использовании класса представления
+    # path('post/<slug:slug>/', ShowPost.as_view(), name='post'),
     # UPD on 21.08.2023 - Lesson 9
     # Добавляем ссылки на категории
     # path('category/<int:cat_id>/', show_category, name='category'),
     # UPD on 22.08.2023 - Lesson 12
     # ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: ДОБАВИТЬ ИСПОЛЬЗОВАНИЕ СЛАГОВ В ОТОБРАЖЕНИЕ URL-АДРЕСОВ КАТЕГОРИЙ
-    path('category/<slug:cat_slug>/', show_category, name='category'),
+    # UPD on 23.08.2023 - Lesson 15
+    # ИЗ-ЗА ДОП. ЗАДАНИЯ В Lesson 12 ИСПРАВЛЕНИЙ В ПАРАМЕТРЫ ПУТИ ВНОСИТЬ НЕ НУЖНО
+    # path('category/<slug:cat_slug>/', show_category, name='category'),
+    path('category/<slug:cat_slug>/', WomenCategory.as_view(), name='category'),
 ]

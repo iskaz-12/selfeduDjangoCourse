@@ -301,6 +301,8 @@ class Category(models.Model):
 
     # UPD on 22.08.2023 - Lesson 12
     # ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: ДОБАВИТЬ ИСПОЛЬЗОВАНИЕ СЛАГОВ В ОТОБРАЖЕНИЕ URL-АДРЕСОВ КАТЕГОРИЙ
+    # UPD on 23.08.2023 - Lesson 15
+    # ОШИБКИ NoReverseMatch at / НЕ ВОЗНИКАЕТ ИЗ-ЗА ТОГО, ЧТО ПЕРЕОПРЕДЕЛИЛА ФУНКЦИЮ В Lesson 12
     def get_absolute_url(self):
         return reverse('category', kwargs={'cat_slug': self.slug})
 

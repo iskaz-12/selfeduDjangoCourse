@@ -1,5 +1,8 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
+# UPD on 23.08.2023 - Lesson 15
+from django.views.generic import ListView, DetailView, CreateView
 
 # UPD on 22.08.2023 - Lesson 13
 from .forms import *
@@ -20,10 +23,50 @@ menu = [{'title': "О сайте", 'url_name': 'about'},
         ]
 
 
+# UPD on 23.08.2023 - Lesson 15
+# Django позволяет создавать представления на основе классов (CBV - Class-Based View)
+# Функции представления позволяют реализовать простую логику обработки запросов
+# Функция index отображала статьи на главной странице сайта
+# В качестве класса представления подойдёт ListView
+# По умолчанию будет искаться шаблон <имя приложения>/<имя модели>_list.html
+class WomenHome(ListView):
+    # Выбираем записи из таблицы и пытаемся отобразить в виде списка
+    model = Women
+    # Меняем шаблон по умолчанию на существующий
+    template_name = 'women/index.html'
+    # Название коллекции в шаблоне
+    context_object_name = 'posts'
+    # Нужно добавить заголовок вкладки в браузере
+    # Существует несколько способов для этого
+    # Атрибут extra_context может использоваться для передачи только статических (неизменяемых) данных
+    # (например, списки передавать нельзя)
+    # extra_context = {'title': 'Главная страница'}
+
+    # Нужно определить спец. функцию для передачи динамического контекста (главного меню)
+    # Т.К. В Lesson 11 ОПРЕДЕЛИЛА ПОЛЬЗОВАТЕЛЬСКИЙ ВКЛЮЧЕННЫЙ ТЕГ ДЛЯ ОТОБРАЖЕНИЯ ГЛАВНОГО МЕНЮ,
+    # ТО ОНО УЖЕ ОТОБРАЖАЕТСЯ КОРРЕКТНО (НО ПРОДОЛЖУ РАБОТАТЬ СОГЛАСНО Lesson 15)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        # Берём существующий контекст у ListView
+        # **kwargs - распаковка словаря kwargs
+        context = super().get_context_data(**kwargs)
+        # Добавляем в context menu
+        context['menu'] = menu
+        # Статические данные передаём здесь
+        context['title'] = 'Главная страница'
+        # Нужно, чтобы пункт 'Все категории' был выбранным
+        context['cat_selected'] = 0
+        return context
+
+    # Будем показывать на главной странице только те записи, у которых is_published=True
+    def get_queryset(self):
+        return Women.objects.filter(is_published=True)
+
+
 # Create your views here.
 # UPD on 16.08.2023 - Lesson 2
 # Создание функции представления
 # Название функции - произвольное
+"""
 def index(request):  # HttpRequest
 
     # return HttpResponse("Страница приложения women.")
@@ -90,6 +133,7 @@ def index(request):  # HttpRequest
     # return render(request, 'women/index.html', {'posts': posts, 'menu': menu, 'title': 'Главная страница'})
 
     return render(request, 'women/index.html', context=context)
+"""
 
 
 # UPD on 19.08.2023 - Lesson 6
@@ -173,6 +217,7 @@ def addpage(request):
 # UPD on 23.08.2023 - Lesson 13
 # Если не прошла проверка корректности данных, то возвращаем не пустую форму, а уже заполненную
 # Если ввести недопустимые значения в поля формы, Django выведет замечание на сайте
+"""
 def addpage(request):
     # Добавляем переменную, ссылающуюся на экземпляр класса формы
     # form = AddPostForm()
@@ -185,7 +230,11 @@ def addpage(request):
             # print(form.cleaned_data)
             # Выполним добавление записи в БД
             try:
-                Women.objects.create(**form.cleaned_data)
+                # UPD on 23.08.2023 - Lesson 14
+                # Для сохранения данных из формы в БД, если форма связана с ней, можно сделать проще
+                # Women.objects.create(**form.cleaned_data)
+                # При попытке добавления записи с занятым URL показывается ошибка (из-за метода save())
+                form.save()
                 return redirect('home')
             # Например, срабатывает при добавлении записи с существующим в БД слагом
             except:
@@ -196,6 +245,50 @@ def addpage(request):
         form = AddPostForm()
     # return render(request, 'women/addpage.html', {'menu': menu, 'title': 'Добавление статьи'})
     return render(request, 'women/addpage.html', {'form': form, 'menu': menu, 'title': 'Добавление статьи'})
+"""
+
+
+# UPD on 23.08.2023 - Lesson 15
+# Добавляем класс представления, реализующий форму для добавления статьи (на основе CreateView)
+# Классы представления позволяют писать программный код компактнее
+class AddPage(CreateView):
+    # Атрибут form_class указывает класс формы, который будет связан с классом представления AddPage
+    form_class = AddPostForm
+    template_name = 'women/addpage.html'
+    # После создания поста Django автоматически перенаправляет нас по адресу
+    # из get_absolute_url в соответствующем классе models.py
+    # Пусть перенаправление идёт на главную страницу
+    # reverse() пытается построить маршрут в момент создания экземпляра класса
+    # reverse_lazy() выполняет создание маршрута, когда он понадобится
+    # Можно почти везде использовать функцию reverse_lazy() вместо reverse()
+    success_url = reverse_lazy('home')
+
+    # Отображаем заголовок вкладки и меню (МЕНЮ УЖЕ ЕСТЬ ИЗ-ЗА ДОП.ЗАДАНИЯ В Lesson 11)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Добавление статьи'
+        context['menu'] = menu
+        return context
+
+
+# UPD on 23.08.2023 - Lesson 14
+# Убираем form.save() из try-except
+"""
+def addpage(request):
+    # Повторный показ формы (с заполненными данными)
+    if request.method == 'POST':
+        # Передаём список файлов, переданных из формы
+        # form = AddPostForm(request.POST)
+        form = AddPostForm(request.POST, request.FILES)
+        if form.is_valid():
+            # print(form.cleaned_data)
+            form.save()
+            return redirect('home')
+    # Первичный показ формы
+    else:
+        form = AddPostForm()
+    return render(request, 'women/addpage.html', {'form': form, 'menu': menu, 'title': 'Добавление статьи'})
+"""
 
 
 def contact(request):
@@ -242,8 +335,28 @@ def show_post(request, post_id):
 """
 
 
+# UPD on 23.08.2023 - Lesson 15
+# Использование класса DetailView для отображения отдельной статьи
+# Отображается пустая статья, т.к. для шаблона post.html не определена переменная post
+class ShowPost(DetailView):
+    model = Women
+    template_name = 'women/post.html'
+    # Переменная для слага (используемого в urls.py)
+    slug_url_kwarg = 'post_slug'
+    # pk_url_kwarg = 'post_pk'
+    context_object_name = 'post'
+
+    # Добавим меню (У МЕНЯ УЖЕ ЕСТЬ ИЗ-ЗА ДОП.ЗАДАНИЯ В Lesson 11) и название вкладки
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = context['post']
+        context['menu'] = menu
+        return context
+
+
 # UPD on 22.08.2023 - Lesson 12
 # Добавляем отображение слага в url
+"""
 def show_post(request, post_slug):
     # Страница отображается по слагу
     post = get_object_or_404(Women, slug=post_slug)
@@ -256,6 +369,7 @@ def show_post(request, post_slug):
     }
 
     return render(request, 'women/post.html', context=context)
+"""
 
 
 # UPD on 21.08.2023 - Lesson 9
@@ -302,8 +416,38 @@ def show_category(request, cat_id):
 """
 
 
+# UPD on 23.08.2023 - Lesson 15
+# Создаём класс представления для отображения категорий
+# Дублирование кода в классах WomenCategory и WomenHome будем убирать позже с помощью mixins
+class WomenCategory(ListView):
+    model = Women
+    template_name = 'women/index.html'
+    context_object_name = 'posts'
+    # Для отображения страницы 404 для несуществующих категорий
+    # Отображается Page not found (404)
+    allow_empty = False
+
+    # Выбираем категории, соответствующие указанному слагу
+    # Через kwargs можем получить переменные маршрута из urls.py
+    # cat__slug - обращаемся к полю slug таблицы Category, связанной с текущей записью
+    def get_queryset(self):
+        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
+
+    # Добавляем получение контекста (для отображения заголовка вкладки, установления категорий без ссылок)
+    # (ИЗ-ЗА ДОП. ЗАДАНИЯ В Lesson 11 МЕНЮ ОТОБРАЖАЕТСЯ ВЕРНО, НО ПРОДЕЛАЕМ АНАЛОГИЧНЫЕ ДЕЙСТВИЯ, КАК В Lesson 15)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['posts'] - коллекция прочитанных записей
+        context['title'] = 'Категория - ' + str(context['posts'][0].cat)
+        context['menu'] = menu
+        # Если укажем несуществующий слаг категории, то возникнет ошибка IndexError at /category/<несуществующий_слаг>/
+        context['cat_selected'] = context['posts'][0].cat_id
+        return context
+
+
 # UPD on 22.08.2023 - Lesson 12
 # ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: ДОБАВИТЬ ИСПОЛЬЗОВАНИЕ СЛАГОВ В ОТОБРАЖЕНИЕ URL-АДРЕСОВ КАТЕГОРИЙ
+"""
 def show_category(request, cat_slug):
     # Находим id по слагу из category
     cat_id = Category.objects.get(slug=cat_slug).pk
@@ -322,3 +466,4 @@ def show_category(request, cat_slug):
     }
 
     return render(request, 'women/index.html', context=context)
+"""

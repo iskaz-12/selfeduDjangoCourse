@@ -15,7 +15,16 @@ UPD on 23.08.2023 - Lesson 13
 Добавим форму
 В action указываем url обработки формы, в method - используемый метод передачи данных (post - для логина/пароля)
 -->
+<!--
+UPD on 23.08.2023 - Lesson 14
+-->
+<!--
+Добавляем возможность обработки фото (атрибут enctype)
+-->
+<!--
 <form action="{% url 'add_page' %}" method="post">
+-->
+<form action="{% url 'add_page' %}" method="post" enctype="multipart/form-data">
     <!--
     csrf-token обеспечивает защиту от CSRF-атак (подделка межсайтовых запросов)
     -->
