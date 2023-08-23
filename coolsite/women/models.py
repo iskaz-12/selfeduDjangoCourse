@@ -4,6 +4,281 @@ from django.db import models
 from django.urls import reverse
 
 
+# UPD on 23.08.2023 - Lesson 16 (Основы ORM Django за час)
+"""
+# Команды для выполнения в командной строке:
+python manage.py shell
+from women.models import *
+Women.objects.all() # сортировка в соответствии с классом Meta модели Women
+Women.objects.all()[:5] # первые 5 записей (отбор на уровне SQL-запроса)
+from django.db import connection
+connection.queries  # ... LIMIT 5
+Women.objects.all()[3:8]
+connection.queries  # ... LIMIT 5 OFFSET 3
+# order_by() - сортировка
+Women.objects.order_by('pk')
+Women.objects.order_by('-pk')   # обратный порядок сортировки
+Women.objects.all().reverse()   # reverse() - обратный порядок относительно стандартного
+Women.objects.all()
+Women.objects.filter(pk__lte=2) # возвращается QuerySet
+Women.objects.get(pk=2) # возвращается экземпляр модели Women
+# Обработка данных связанных таблиц
+w = Women.objects.get(pk=1)
+# Доступные свойства:
+# w.title, …, w. is_published – значения полей записи таблицы women;
+# w.pk, w.id – идентификаторы записи (первичный ключ);
+# w.cat_id – идентификатор рубрики (внешний ключ);
+# w.cat – объект класса Category, хранящий данные записи с id = cat_id.
+w.cat   # ссылка на категорию - <Category: Актрисы> # из-за перегруженного в Category метода __str__
+w.cat.name  # 'Актрисы'
+# Получение связанных данных - только в момент обращения к ним
+connection.queries
+w.cat.name
+# Используя первичную модель Category, получим все связанные с ней посты из вторичной модели Women
+# У любой первичной модели по умолчанию создаётся объёкт <вторичная модель>_set, 
+# с помощью которого можно выбирать все связанные записи
+c = Category.objects.get(pk=1)
+c   # <Category: Актрисы>
+c.women_set # ссылка на объект
+c.women_set.all()
+# Другое название для women_set
+exit()
+python manage.py shell
+from women.models import *
+c = Category.objects.get(pk=2)
+c.get_posts.all()
+c.get_posts.filter(is_published=True)
+exit()
+# Фильтры полей (lookups)
+python manage.py shell
+# Уже известные нам lookups 
+# <имя атрибута>__gte – сравнение больше или равно (>=);
+# <имя атрибута>__lte – сравнение меньше или равно (<=).
+from women.models import *
+Women.objects.filter(pk__gt=2)
+# lookups contains (поиск, чувствительный к регистру) и icontains (поиск, нечувствительный к регистру)
+Women.objects.filter(title__contains='ли')
+from django.db import connection
+connection.queries  # ... WHERE ... "title" LIKE \'%ли%\' ...
+Women.objects.filter(title__icontains='ЛИ') # <QuerySet []>
+# SQLite3 не поддерживает регистронезависимый поиск для не ASCII-символов
+# В случае с латинскими символами в SQLite поиск всегда проходит как регистронезависимый
+# Фильтр in (указание выбираемых значений через список)
+Women.objects.filter(pk__in=[2,5,11,12])
+Women.objects.filter(pk__in=[2,5,11,12], is_published=True) # объединение условий по and
+# Применение in для внешнего ключа
+Women.objects.filter(cat__in=[1, 2])
+Women.objects.filter(cat_id__in=[1, 2])
+cats = Category.objects.all()
+Women.objects.filter(cat__in=cats)
+# Использование класса Q (логическое ИЛИ или НЕ в условии)
+# Совместные с классом Q операторы: 
+# & - логическое И (приоритет 2);
+# | - логическое ИЛИ (приоритет 3);
+# ~ - логическое НЕ (приоритет 1).
+from django.db.models import Q
+Women.objects.filter(pk__lt=5, cat_id=2)    # <QuerySet []> (т.к. записи с 1-й по 4-ю относятся к 1-й рубрике)
+Women.objects.filter(Q(pk__lt=5) | Q(cat_id=2))
+Women.objects.filter(Q(pk__lt=5) & Q(cat_id=2)) # <QuerySet []>
+Women.objects.filter(~Q(pk__lt=5) | Q(cat_id=2))    # ~Q(pk__lt=5) - взять записи с pk>=5 
+Women.objects.filter(~Q(pk__lt=5) & Q(cat_id=2))
+# Быстрое получение записей из таблицы
+Women.objects.first()   # <Women: Ариана Гранде> (берётся 1-я запись в соответствии с порядком сортировки модели)
+Women.objects.all()
+Women.objects.order_by('pk').first()    # <Women: Анджелина Джоли>
+Women.objects.order_by('-pk').first()   # <Women: Ариана Гранде>
+Women.objects.order_by('pk').last() # <Women: Ариана Гранде>
+Women.objects.order_by('-pk').last()    # <Women: Анджелина Джоли>
+Women.objects.filter(pk__gt=5).last()   # <Women: Ариана Гранде>
+# Получение записи по дате
+# Существуют методы: 
+# latest() – выбор записи с самой поздней датой (наибольшей);
+# earliest() – выбор записи с самой ранней датой (наименьшей).
+Women.objects.latest('time_update') # <Women: Ариана Гранде>
+Women.objects.earliest('time_update')   # <Women: Анджелина Джоли>
+# Методы earliest/latest работают без учёта сортировки
+Women.objects.order_by('title').earliest('time_update') # <Women: Анджелина Джоли>
+Women.objects.order_by('title').latest('time_update')   # <Women: Ариана Гранде>
+# Выбор записи относительно текущей (по дате)
+w = Women.objects.get(pk=7)
+w   # <Women: Бейонсе>
+w.get_previous_by_time_update() # <Women: Ариана Гранде>
+# суффикс time_update – название поля, по которому определяется предыдущая запись
+w.get_next_by_time_update() # <Women: Кэтти Перри>
+# В данных методах можно дополнительно указывать условия выборки следующей/предыдущей записи
+w.get_next_by_time_update(pk__gt=10)    # <Women: Анастасия Эшли>
+# Методы exists() и count()
+# exists() – проверка существования записи;
+# count() – получение числа записей.
+# Добавим новую категорию - спортсменки
+Category.objects.create(name='Спортсменки', slug='sportsmenki') # <Category: Спортсменки>
+c3 = Category.objects.get(pk=3)
+c3  # <Category: Спортсменки>
+c3.women_set.exists()   # False (нет ни одной записи, связанной со спортсменками)
+c2 = Category.objects.get(pk=2)
+c2.women_set.exists()   # True
+c2.women_set.count()    # 7
+c3.women_set.count()    # 0
+# Методы exists() и count() применяются к любой выборке
+Women.objects.filter(pk__gt=4).count()  # 10
+# Выборка записей по полям связанных моделей
+Women.objects.filter(cat__slug='aktrisy')
+# Параметр cat__slug сформирован по правилу: <имя первичной модели>__<название поля первичной модели>
+Women.objects.filter(cat__in=[1])   # результат аналогичен результату предыдущей команды
+Women.objects.filter(cat__name='Певицы')    # происходит объединение записей из 2 таблиц
+connection.queries  # ... INNER JOIN "women_category" ON ("women_women"."cat_id" = "women_category"."id")
+# WHERE "women_category"."name" = \'Певицы\' ...
+Women.objects.filter(cat__name='Певицы')
+# После имени поля можно дополнительно указывать фильтры
+Women.objects.filter(cat__name__contains='ы')   # актрисы и певицы
+Women.objects.filter(cat__name__contains='цы')  # певицы
+# Выберем все категории, которые связаны с записями вторичной модели Women, содержащие 'ли'
+Category.objects.filter(women__title__contains='ли')
+# <QuerySet [<Category: Актрисы>, <Category: Актрисы>, <Category: Актрисы>, <Category: Певицы>]>
+# Для получения уникальных категорий используем метод distinct()
+Category.objects.filter(women__title__contains='ли').distinct() # <QuerySet [<Category: Актрисы>, <Category: Певицы>]>
+# Некоторые функции агрегации
+# Функции агрегации в SQL-запросах выполняются в последнюю очередь (после WHERE)
+# Пример - функция count()
+Women.objects.count()   # 14
+# Остальные агрегирующие команды прописываем в спец. методе aggregate()
+Women.objects.aggregate(Min('cat_id'))  # NameError: name 'Min' is not defined
+from django.db.models import *
+Women.objects.aggregate(Min('cat_id'))  # {'cat_id__min': 1}
+Women.objects.aggregate(Min('cat_id'), Max('cat_id'))   # {'cat_id__min': 1, 'cat_id__max': 2}
+# Названия ключей можно менять
+Women.objects.aggregate(cat_min=Min('cat_id'), cat_max=Max('cat_id'))   # {'cat_min': 1, 'cat_max': 2}
+# С агрегирующими значениями можно выполнять различные математические операции
+Women.objects.aggregate(res=Sum('cat_id') - Count('cat_id'))    # {'res': 7}
+Women.objects.aggregate(res=Avg('cat_id'))  # {'res': 1.5}
+# Агрегацию можно применять только к некоторым записям
+Women.objects.filter(pk__gt=4).aggregate(res=Avg('cat_id')) # {'res': 1.7}
+# Выбор записи и её конкретных полей
+w = Women.objects.get(pk=1)
+w.title # 'Анджелина Джоли'
+w.slug  # 'andzhelina-dzholi'
+connection.queries  # После SELECT перечисляются все поля таблицы women
+# Для указания нужных полей в выборке используется метод values()
+Women.objects.values('title', 'cat_id').get(pk=1)   # {'title': 'Анджелина Джоли', 'cat_id': 1}
+connection.queries  # Выбирается всего 2 поля в SELECT
+# Можно использовать связанные данные
+Women.objects.values('title', 'cat__name').get(pk=1)    # {'title': 'Анджелина Джоли', 'cat__name': 'Актрисы'}
+connection.queries  # ... FROM "women_women" INNER JOIN "women_category" 
+# ON ("women_women"."cat_id" = "women_category"."id") ...
+w = Women.objects.values('title', 'cat__name')
+w   # <QuerySet [{'title': 'Ариана Гранде', 'cat__name': 'Певицы'}, ...]>
+connection.queries  # выполнился всего 1 sql-запрос
+for p in w:
+     print(p['title'], p['cat__name'])
+connection.queries  # выполнился всего 1 sql-запрос
+# Группировка записей и агрегирование (метод annotate())
+Women.objects.values('cat_id').annotate(Count('id'))
+# <QuerySet [{'cat_id': 1, 'id__count': 7}, {'cat_id': 2, 'id__count': 7}]>
+# Аналог SQL-запроса: SELECT count(id) FROM women GROUP BY cat_id
+# У МЕНЯ ЗАПРОС ВЫПОЛНИЛСЯ НОРМАЛЬНО СРАЗУ ПОЧЕМУ-ТО...
+# НО В УРОКЕ РЕКОМЕНДУЮТ УБРАТЬ ordering ИЗ Meta (СДЕЛАЮ ТАК)
+exit()
+# ЗАКОММЕНТИРУЕМ ordering В Meta
+python manage.py shell
+from women.models import *
+from django.db.models import *
+from django.db import connection
+Women.objects.values('cat_id').annotate(Count('id'))
+# <QuerySet [{'cat_id': 1, 'id__count': 7}, {'cat_id': 2, 'id__count': 7}]>
+Women.objects.annotate(Count('cat'))    # группировка идёт по всем полям
+# Если для первичной модели Category вызвать метод annotate и в агрегирующей функции Count передать
+# в аргументы 'women', то получим все рубрики
+c = Category.objects.annotate(Count('women'))
+c   # <QuerySet [<Category: Актрисы>, <Category: Певицы>, <Category: Спортсменки>]>
+c[0].women__count   # 7 (количество записей, связанных с рубрикой)
+c[1].women__count   # 7
+c = Category.objects.annotate(total=Count('women'))
+c[0].total  # 7
+len(c)  # 3
+# Выведем рубрики, где есть записи
+c = Category.objects.annotate(total=Count('women')).filter(total__gt=0)
+c   # <QuerySet [<Category: Актрисы>, <Category: Певицы>]>
+# Класс F
+Women.objects.filter(pk__lte='cat_id')  # такая запись приведёт к ошибке
+# Чтобы такая операция стало допустимой, нужно использовать спец. класс F
+from django.db.models import F
+# Сравним pk с полем cat_id текущей записи
+Women.objects.filter(pk__gt=F('cat_id'))    # получим все записи, кроме 1-й
+connection.queries  # ... WHERE "women_women"."id" > ("women_women"."cat_id") ...
+Women.objects.filter(pk__gt=F('cat_id'))
+# Пусть в таблице women есть поле views - число просмотров записи
+#views
+# Увеличим значение views конкретной записи на 1
+Women.objects.filter(slug='bejonse').update(views=F('views')+1)
+# Возникает ошибка из-за отсутствия поля views в таблице women
+# Можно сделать так
+w = Women.objects.get(pk=1)
+w   # <Women: Анджелина Джоли>
+w.views = F('views')+1
+w.save()
+# Можно также было бы использовать
+w.views += 1
+# Но документация Django не рекомендует так делать из-за риска возникновения коллизий
+# (одновременное получение одной и той же страницы разными пользователями; views будет увеличено только один раз)
+# Класс F решает данную проблему
+# Вычисления на стороне СУБД
+# Django содержит набор функций Database Functions, которые позволяют делать вычисления на стороне СУБД
+# Это и функции работы со строками, датой, математические функции и так далее.
+# Эти функции рекомендуется применять на практике
+# Рассмотрим работу функции Length() (вычисляет длину строки)
+from django.db.models.functions import Length
+# Аннотируем новое вычисляемое поле, например, для заголовков статей
+ps = Women.objects.annotate(len=Length('title'))
+ps  # <QuerySet [<Women: Анджелина Джоли>, ...]>
+for item in ps:
+     print(item.title, item.len)
+# Анджелина Джоли 15 ...
+# По аналогии используются и остальные функции
+# raw SQL-запросы
+# Непосредственно выполнить SQL-запрос можно через метод Manager.raw(<SQL-запрос>)
+Women.objects.raw('SELECT * FROM women_women')  # <RawQuerySet: SELECT * FROM women_women>
+w = _
+for p in w:
+     print(p.pk, p.title)
+# 1 Анджелина Джоли ...
+# Тот же результат получим и при использовании Category
+w = Category.objects.raw('SELECT * FROM women_women')
+w   # <RawQuerySet: SELECT * FROM women_women>
+# Сами объекты w будут экземплярами класса Category
+w[0]    # <Category: Актрисы>
+# Нюансы метода raw()
+# 1. "ленивое" исполнение запроса, то есть, отложенная загрузка информации до момента первого обращения к ней
+from django.db import reset_queries
+reset_queries() # функция для очистки connection.queries
+connection.queries  # []
+w = Women.objects.raw('SELECT * FROM women_women')
+connection.queries  # [] (не было сгенерировано ни одного запроса)
+w[0]    # <Women: Анджелина Джоли>
+connection.queries  # [{'sql': 'SELECT * FROM women_women', 'time': '0.000'}]
+# 2. При выборке конкретных полей в команде SELECT мы обязаны всегда указывать поле id
+w = Women.objects.raw('SELECT id, title FROM women_women')
+w   # <RawQuerySet: SELECT id, title FROM women_women>
+w = Women.objects.raw('SELECT title FROM women_women')
+w[0]    # django.core.exceptions.FieldDoesNotExist: Raw query must include the primary key
+w = Women.objects.raw('SELECT id, title FROM women_women')
+w[0].is_published   # True (хотя мы не указывали это поле в запросе)
+connection.queries  # был выполнен дополнительный запрос (механизм отложенной загрузки полей)
+# Это не лучшая практика (неоправданная нагрузка СУБД, особенно в цикле)
+# Передача параметров в запрос
+# Запрос на выбор записи по слагу
+Women.objects.raw("SELECT id, title FROM women_women WHERE slug='shakira'")
+# <RawQuerySet: SELECT id, title FROM women_women WHERE slug='shakira'>
+# Обычно вместо значения слага используют параметр
+slug = 'shakira'
+Women.objects.raw("SELECT id, title FROM women_women WHERE slug='" + slug + "'")
+# <RawQuerySet: SELECT id, title FROM women_women WHERE slug='shakira'>
+# Это прямой путь к SQL-инъекциям
+# Используем механизм параметров raw запросов (через список параметров) (безопасный путь)
+Women.objects.raw("SELECT id, title FROM women_women WHERE slug='%s'", [slug])
+# RawQuerySet: SELECT id, title FROM women_women WHERE slug='shakira'>
+"""
+
+
 # Create your models here.
 # UPD on 17.08.2023 - Lesson 4
 # Создаём класс Women (название м.б. произвольным), он соответствует таблице Women в базе данных
@@ -64,7 +339,10 @@ class Women(models.Model):
     # UPD on 22.08.2023 - Lesson 12
     # Нужно удалить все миграции, чтобы перестроить БД
     # cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, verbose_name="Категории")
+    # UPD on 23.08.2023 - Lesson 16
+    # Можно переименовать свойство women_set на другое
     cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name="Категории")
+    # cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name="Категории", related_name='get_posts')
 
     # UPD on 17.08.2023 - Lesson 4
     # Чтобы создать таблицу в БД нужно создать и выполнить миграции
@@ -235,7 +513,9 @@ class Women(models.Model):
         verbose_name_plural = 'Известные женщины'
         # '-' - сортировка в обратном порядке
         # ordering = ['time_create', 'title']
-        ordering = ['-time_create', 'title']
+        # UPD on 23.08.2023 - Lesson 16
+        # ИСПРАВЛЕНИЕ ОШИБКИ НАСЧЁТ ФУНКЦИИ annotate() ПО ПРИМЕРУ В УРОКЕ
+        # ordering = ['-time_create', 'title']
 
 
 # UPD on 21.08.2023 - Lesson 9
