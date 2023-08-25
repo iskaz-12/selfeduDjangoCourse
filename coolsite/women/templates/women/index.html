@@ -1,5 +1,11 @@
 {% extends 'women/base.html' %}
 <!--
+UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+Загружаем пользовательские теги
+-->
+{% load women_tags %}
+
+<!--
 <!DOCTYPE html>
 <html>
 <head>
@@ -104,9 +110,20 @@ UPD on 21.08.2023 - Lesson 10
 				<!--
 				Выводим фото на сайте
 				-->
-				{% if p.photo %}
+				<!--
+
+
          <p><img class="img-article-left thumb" src="{{p.photo.url}}"></p>
-{% endif %}
+				-->
+				<!--
+				UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+				Попробуем проверять наличие хотя бы одной фотографии
+				Переносим отображение фото в отдельный шаблон
+				-->
+				{% show_photos women_id=p.pk %}
+
+
+
 				<h2>{{p.title}}</h2>
                 <!--
                 UPD on 20.08.2023 - Lesson 7

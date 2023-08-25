@@ -55,6 +55,7 @@ class WomenHome(ListView):
         context['title'] = 'Главная страница'
         # Нужно, чтобы пункт 'Все категории' был выбранным
         context['cat_selected'] = 0
+
         return context
 
     # Будем показывать на главной странице только те записи, у которых is_published=True

@@ -1,0 +1,90 @@
+<!--
+				UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+				Пока оставляем только первое фото из списка
+				-->
+
+{% if photos|length > 0 %}
+
+	<!--
+	Если в БД больше 3 фото для статьи - выводим только первые 3
+	Т.к. в Django нет встроенного цикла типа "for i = 1 to n", то пропишу все варианты чистым HTML
+	-->
+	{% if photos|length >= 3 %}
+
+				<!--
+				UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+				Нужно ещё добавить слайдер для фото
+				Пробую согласно следующему материалу:
+				https://codepen.io/kocsten/pen/PoYpPaZ
+
+				НУЖНО ДИНАМИЧЕСКОЕ ИЗМЕНЕНИЕ ID КНОПОК!!!
+				-->
+
+<div class="slider thumb">
+  <input type="radio" name="switch" id="btn1" checked>
+  <input type="radio" name="switch" id="btn2">
+  <input type="radio" name="switch" id="btn3">
+
+  <div class="switch">
+    <label for="btn1"></label>
+    <label for="btn2"></label>
+    <label for="btn3"></label>
+  </div>
+
+  <div class="slider-inner">
+    <div class="slides">
+
+		{% for ph in photos %}
+
+      <img src="{{ph.photo.url}}"/>
+
+		{% endfor %}
+
+    </div>
+  </div>
+
+</div>
+
+	{% elif photos|length == 2 %}
+
+	<div class="slider thumb">
+  <input type="radio" name="switch" id="btn1_" checked>
+  <input type="radio" name="switch" id="btn2_">
+
+  <div class="switch">
+    <label for="btn1_"></label>
+    <label for="btn2_"></label>
+  </div>
+
+  <div class="slider-inner">
+    <div class="slides">
+      {% for ph in photos %}
+
+      <img src="{{ph.photo.url}}"/>
+
+		{% endfor %}
+	</div>
+  </div>
+
+</div>
+
+	{% else %}
+
+		{% for ph in photos %}
+
+				<p><img class="img-article-left thumb" src="{{ph.photo.url}}"></p>
+
+		{% endfor %}
+
+
+	{% endif %}
+
+				<!--
+				UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+				Если нет фотографии - выводим картинку-заглушку
+				Не стала подключать через styles.css
+				-->
+				{% else %}
+				<p><img class="img-article-left thumb" src="../static/women/images/no_photo.png"></p>
+
+{% endif %}

@@ -332,7 +332,11 @@ class Women(models.Model):
     # 2
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
     content = models.TextField(blank=True, verbose_name="Текст статьи")
-    photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
+
+    # UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+    # Переношу поле photo в отдельную модель
+    # photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
+
     time_create = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
     time_update = models.DateTimeField(auto_now=True, verbose_name="Время изменения")
     is_published = models.BooleanField(default=True, verbose_name="Публикация")
@@ -592,8 +596,22 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
         ordering = ['id']
 
+
+# UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+# ДОБАВЛЕНИЕ ЧЕРЕЗ АДМИНИСТРАТИВНЫЙ ИНТЕРФЕЙС ЛЮБОГО КОЛИЧЕСТВА ФОТОГРАФИЙ К ЗАПИСИ В МОДЕЛИ Women
+# Придётся переопределять структуру БД
+# python manage.py makemigrations
+# python manage.py migrate
+# Таблица womenphoto пока пустая
+class WomenPhoto(models.Model):
+    photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
+    # Определяем внешний ключ
+    women = models.ForeignKey(Women, on_delete=models.PROTECT, verbose_name="Известные женщины")
+
+
 # UPD on 21.08.2023 - Lesson 9
 # Добавим записи в таблицу category
+"""
 # python manage.py shell
 # from women.models import *
 # Category.objects.create(name='Актрисы')
@@ -630,3 +648,4 @@ class Category(models.Model):
 # connection.queries
 # w2.cat.name   # 'Актрисы'
 # exit()
+"""

@@ -82,7 +82,12 @@ class AddPostForm(forms.ModelForm):
 
     class Meta:
         model = Women
-        fields = ['title', 'slug', 'content', 'photo', 'is_published', 'cat']
+
+        # UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+        # Пробую изменить модель с помощью миграции
+        # fields = ['title', 'slug', 'content', 'photo', 'is_published', 'cat']
+        fields = ['title', 'slug', 'content', 'is_published', 'cat']
+
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-input'}),
             'content': forms.Textarea(attrs={'cols': 60, 'rows': 10}),

@@ -71,3 +71,11 @@ def show_categories(sort=None, cat_selected=""):
 @register.inclusion_tag('women/list_menu.html')
 def show_menu():
     return {"menu": menu}
+
+
+# UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+# Определим пользовательский включенный тег для получения всех фото из womenphoto по women_id
+@register.inclusion_tag('women/photo.html')
+def show_photos(women_id=0):
+    photos = WomenPhoto.objects.filter(women_id=women_id)
+    return {"photos": photos}
