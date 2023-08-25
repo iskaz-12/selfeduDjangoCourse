@@ -6,12 +6,26 @@ UPD on 21.08.2023 - Lesson 12
 -->
 {% extends 'women/base.html' %}
 
+<!--
+UPD on 25.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+Подгружаем пользовательские теги
+-->
+{% load women_tags %}
+
 {% block content %}
 <h1>{{post.title}}</h1>
 
+<!--
+UPD on 25.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+Исправим динамическую загрузку фото в пост
+-->
+<!--
 {% if post.photo %}
 <p><img class="img-article-left" src="{{post.photo.url}}"></p>
 {% endif %}
+-->
+
+{% show_photos_in_post women_id=post.pk %}
 
 <!--
 Фильтр linebreaks добавляет теги абзацев в статью

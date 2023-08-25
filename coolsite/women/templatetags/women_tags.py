@@ -76,6 +76,14 @@ def show_menu():
 # UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
 # Определим пользовательский включенный тег для получения всех фото из womenphoto по women_id
 @register.inclusion_tag('women/photo.html')
-def show_photos(women_id=0):
+def show_photos(women_id=0, cat_selected=0):
+    photos = WomenPhoto.objects.filter(women_id=women_id)
+    return {"photos": photos, "cat_selected": cat_selected}
+
+
+# UPD on 25.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+# Определим тег для отображения фото в отдельном посте
+@register.inclusion_tag('women/photo_post.html')
+def show_photos_in_post(women_id=0):
     photos = WomenPhoto.objects.filter(women_id=women_id)
     return {"photos": photos}

@@ -3,7 +3,6 @@
 from django.db import models
 from django.urls import reverse
 
-
 # UPD on 23.08.2023 - Lesson 16 (Основы ORM Django за час)
 """
 # Команды для выполнения в командной строке:
@@ -346,6 +345,7 @@ class Women(models.Model):
     # UPD on 23.08.2023 - Lesson 16
     # Можно переименовать свойство women_set на другое
     cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name="Категории")
+
     # cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name="Категории", related_name='get_posts')
 
     # UPD on 17.08.2023 - Lesson 4
@@ -607,6 +607,14 @@ class WomenPhoto(models.Model):
     photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
     # Определяем внешний ключ
     women = models.ForeignKey(Women, on_delete=models.PROTECT, verbose_name="Известные женщины")
+
+    # UPD on 25.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
+    def __str__(self):
+        return "Photo " + str(self.pk) + " for Woman " + str(self.women_id)
+
+    class Meta:
+        verbose_name = 'Фотография известной женщины'
+        verbose_name_plural = 'Фотографии известных женщин'
 
 
 # UPD on 21.08.2023 - Lesson 9

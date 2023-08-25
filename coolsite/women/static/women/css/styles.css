@@ -444,23 +444,11 @@ https://codepen.io/kocsten/pen/PoYpPaZ
   Устанавливаем доп.атрибут для выравнивания по левому краю
   */
   float: left;
-  margin: 50px 10px auto;
+  margin: 10px 10px 30px auto;
   box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.75);
   /*
   padding: 0 10px 10px 0;
   */
-}
-
-/*
-Стиль для слайдера в списке статей
-*/
-.slider.thumb {
-  /*
-  UPD on 25.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
-  Устанавливаем max-width, совпадающий с max-width img.img-article-left.thumb
-  */
-  width: 150px;
-  height: 150px;
 }
 
 .slider input[name="switch"] {
@@ -486,6 +474,10 @@ https://codepen.io/kocsten/pen/PoYpPaZ
   border: 5px solid #2f363c;
   background-color: #738290;
 }
+
+/*
+#btn* - для кнопок с разными id
+*/
 
 #btn1:checked~.switch label[for="btn1"] {
   background-color: white;
@@ -524,6 +516,10 @@ https://codepen.io/kocsten/pen/PoYpPaZ
   */
   flex-shrink:0;
 
+  /*
+  Возможный вариант - добавить Pillow + холст фикс. размера + встраивание картинки
+  */
+
 	/*
 UPD on 25.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ
 Попытка масштабирования картинок в слайдере
@@ -535,8 +531,8 @@ object-fit: cover;
 width: 100%;
 height: 100%;
 */
-width: 150px;
-height: 150px;
+width: 300px;
+height: 300px;
 }
 
 #btn1:checked~slider-inner slides {
