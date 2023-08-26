@@ -1,14 +1,19 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 # UPD on 23.08.2023 - Lesson 15
 from django.views.generic import ListView, DetailView, CreateView
+# UPD on 26.08.2023 - Lesson 17
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # UPD on 22.08.2023 - Lesson 13
 from .forms import *
 # UPD on 19.08.2023 - Lesson 6
 # Выполним чтение данных из таблицы women БД и отобразим на главной странице
 from .models import *
+# UPd on 26.08.2023 - Lesson 17
+from .utils import *
 
 # UPD on 19.08.2023 - Lesson 6
 # Список для главного меню
@@ -16,11 +21,13 @@ from .models import *
 
 # UPD on 21.08.2023 - Lesson 8
 # Переопределяем menu для формирования ссылок (url_name - имя маршрута)
+"""
 menu = [{'title': "О сайте", 'url_name': 'about'},
         {'title': "Добавить статью", 'url_name': 'add_page'},
         {'title': "Обратная связь", 'url_name': 'contact'},
         {'title': "Войти", 'url_name': 'login'}
         ]
+"""
 
 
 # UPD on 23.08.2023 - Lesson 15
@@ -29,6 +36,7 @@ menu = [{'title': "О сайте", 'url_name': 'about'},
 # Функция index отображала статьи на главной странице сайта
 # В качестве класса представления подойдёт ListView
 # По умолчанию будет искаться шаблон <имя приложения>/<имя модели>_list.html
+"""
 class WomenHome(ListView):
     # Выбираем записи из таблицы и пытаемся отобразить в виде списка
     model = Women
@@ -57,6 +65,35 @@ class WomenHome(ListView):
         context['cat_selected'] = 0
 
         return context
+
+    # Будем показывать на главной странице только те записи, у которых is_published=True
+    def get_queryset(self):
+        return Women.objects.filter(is_published=True)
+"""
+
+
+# UPD on 26.08.2023 - Lesson 17
+class WomenHome(DataMixin, ListView):
+    # Выбираем записи из таблицы и пытаемся отобразить в виде списка
+    model = Women
+    # Меняем шаблон по умолчанию на существующий
+    template_name = 'women/index.html'
+    # Название коллекции в шаблоне
+    context_object_name = 'posts'
+
+    # Нужно определить спец. функцию для передачи динамического контекста (главного меню)
+    # Т.К. В Lesson 11 ОПРЕДЕЛИЛА ПОЛЬЗОВАТЕЛЬСКИЙ ВКЛЮЧЕННЫЙ ТЕГ ДЛЯ ОТОБРАЖЕНИЯ ГЛАВНОГО МЕНЮ,
+    # ТО ОНО УЖЕ ОТОБРАЖАЕТСЯ КОРРЕКТНО (НО ПРОДОЛЖУ РАБОТАТЬ СОГЛАСНО Lesson 15)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        # Берём существующий контекст у ListView
+        # **kwargs - распаковка словаря kwargs
+        context = super().get_context_data(**kwargs)
+
+        # UPD on 26.08.2023 - Lesson 17
+        c_def = self.get_user_context(title="Главная страница")
+
+        # Словари c_def и context будут формировать нужный общий контекст
+        return dict(list(context.items()) + list(c_def.items()))
 
     # Будем показывать на главной странице только те записи, у которых is_published=True
     def get_queryset(self):
@@ -140,6 +177,7 @@ def index(request):  # HttpRequest
 # UPD on 19.08.2023 - Lesson 6
 # Функция-обработчик шаблона about.xml
 # Ещё нужно прописать пути в urls.py
+"""
 def about(request):
     # return render(request, 'women/about.html')
 
@@ -148,6 +186,15 @@ def about(request):
 
     # Добавим в параметры menu
     # Видно, что нарушается принцип DRY - нам нужно создать базовый шаблон base.html
+    return render(request, 'women/about.html', {'menu': menu, 'title': 'О сайте'})
+"""
+
+
+# UPD on 26.08.2023 - Lesson 17
+# Для запрета доступа к странице незарегистрированным пользователям в случае с функциями представления
+# нужно использовать специальный декоратор (ошибка 404)
+# @login_required
+def about(request):
     return render(request, 'women/about.html', {'menu': menu, 'title': 'О сайте'})
 
 
@@ -252,6 +299,7 @@ def addpage(request):
 # UPD on 23.08.2023 - Lesson 15
 # Добавляем класс представления, реализующий форму для добавления статьи (на основе CreateView)
 # Классы представления позволяют писать программный код компактнее
+"""
 class AddPage(CreateView):
     # Атрибут form_class указывает класс формы, который будет связан с классом представления AddPage
     form_class = AddPostForm
@@ -270,6 +318,30 @@ class AddPage(CreateView):
         context['title'] = 'Добавление статьи'
         context['menu'] = menu
         return context
+"""
+
+
+# UPD on 26.08.2023 - Lesson 17
+# Сделаем возможность добавления статьи доступной только для авторизованных пользователей
+# Чтобы всё сработало, необходимо выйти из admin-панели
+# class AddPage(DataMixin, CreateView):
+class AddPage(LoginRequiredMixin, DataMixin, CreateView):
+    # Атрибут form_class указывает класс формы, который будет связан с классом представления AddPage
+    form_class = AddPostForm
+    template_name = 'women/addpage.html'
+    success_url = reverse_lazy('home')
+    # Укажем адрес перенаправления для незарегистрированного пользователя
+    # Прописывать конкретные URL-адреса в коде - не очень хорошая практика
+    # login_url = '/admin/'
+    login_url = reverse_lazy('home')
+    # Генерация страницы 403 для незарегистрированных пользователей
+    raise_exception = True
+
+    # Отображаем заголовок вкладки и меню (МЕНЮ УЖЕ ЕСТЬ ИЗ-ЗА ДОП.ЗАДАНИЯ В Lesson 11)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Добавление статьи")
+        return dict(list(context.items()) + list(c_def.items()))
 
 
 # UPD on 23.08.2023 - Lesson 14
@@ -339,6 +411,7 @@ def show_post(request, post_id):
 # UPD on 23.08.2023 - Lesson 15
 # Использование класса DetailView для отображения отдельной статьи
 # Отображается пустая статья, т.к. для шаблона post.html не определена переменная post
+"""
 class ShowPost(DetailView):
     model = Women
     template_name = 'women/post.html'
@@ -353,6 +426,24 @@ class ShowPost(DetailView):
         context['title'] = context['post']
         context['menu'] = menu
         return context
+"""
+
+
+# UPD on 26.08.2023 - Lesson 17
+class ShowPost(DataMixin, DetailView):
+    model = Women
+    template_name = 'women/post.html'
+    # Переменная для слага (используемого в urls.py)
+    slug_url_kwarg = 'post_slug'
+    context_object_name = 'post'
+
+    # Добавим меню (У МЕНЯ УЖЕ ЕСТЬ ИЗ-ЗА ДОП.ЗАДАНИЯ В Lesson 11) и название вкладки
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # заголовок title формируется на основе context,
+        # созданного в методе get_context_data() базового класса DetailView
+        c_def = self.get_user_context(title=context['post'])
+        return dict(list(context.items()) + list(c_def.items()))
 
 
 # UPD on 22.08.2023 - Lesson 12
@@ -420,6 +511,7 @@ def show_category(request, cat_id):
 # UPD on 23.08.2023 - Lesson 15
 # Создаём класс представления для отображения категорий
 # Дублирование кода в классах WomenCategory и WomenHome будем убирать позже с помощью mixins
+"""
 class WomenCategory(ListView):
     model = Women
     template_name = 'women/index.html'
@@ -444,6 +536,30 @@ class WomenCategory(ListView):
         # Если укажем несуществующий слаг категории, то возникнет ошибка IndexError at /category/<несуществующий_слаг>/
         context['cat_selected'] = context['posts'][0].cat_id
         return context
+"""
+
+
+# UPD on 26.08.2023 - Lesson 17
+# Весь общий код классов представлений был вынесен в DataMixin
+class WomenCategory(DataMixin, ListView):
+    model = Women
+    template_name = 'women/index.html'
+    context_object_name = 'posts'
+    # Для отображения страницы 404 для несуществующих категорий
+    # Отображается Page not found (404)
+    allow_empty = False
+
+    def get_queryset(self):
+        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
+
+    # Добавляем получение контекста (для отображения заголовка вкладки, установления категорий без ссылок)
+    # (ИЗ-ЗА ДОП. ЗАДАНИЯ В Lesson 11 МЕНЮ ОТОБРАЖАЕТСЯ ВЕРНО, НО ПРОДЕЛАЕМ АНАЛОГИЧНЫЕ ДЕЙСТВИЯ, КАК В Lesson 15)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # UPD on 26.08.2023 - Lesson 17
+        c_def = self.get_user_context(title='Категория - ' + str(context['posts'][0].cat),
+                                      cat_selected=context['posts'][0].cat_id)
+        return dict(list(context.items()) + list(c_def.items()))
 
 
 # UPD on 22.08.2023 - Lesson 12

@@ -236,7 +236,29 @@ UPD on 21.08.2023 - Lesson 11
 		<!--
 		Если сортировка категорий не нужна, передаём 1 параметр
 		-->
-		{% show_categories cat_selected=cat_selected %}
+		<!--
+		UPD on 26.08.2023 - Lesson 17
+		Вернём отображение рубрик не через пользовательский тег, а через cats
+		-->
+		<!--
+
+		-->
+		{% for c in cats %}
+		<!--
+		UPD on 26.08.2023 - Lesson 17
+		Добавим условие, чтобы не отображались пустые рубрики
+		-->
+		{% if c.women__count > 0 %}
+         {% if c.pk == cat_selected %}
+                   <li class="selected">{{c.name}}</li>
+         {% else %}
+                   <li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
+         {% endif %}
+		<!--
+		UPD on 26.08.2023 - Lesson 17
+		-->
+		{% endif %}
+		{% endfor %}
 
 		<li class="share">
 		<p>Наш канал</p>

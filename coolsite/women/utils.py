@@ -1,0 +1,47 @@
+# UPD on 25.08.2023 - Lesson 17 (Mixins)
+# В Python, благодаря наличию механизма множественного наследования,
+# примеси (mixins) можно добавлять в виде отдельного базового класса
+# Класс DataMixin лучше передавать первым в списке наследования
+# (т.к. в нем могут быть атрибуты и методы, которые используются конструктором следующего класса)
+# Обычно в Django все вспомогательные классы объявляют в отдельном файле приложения utils.py
+from django.db.models import Count
+
+from .models import *
+
+menu = [{'title': "О сайте", 'url_name': 'about'},
+        {'title': "Добавить статью", 'url_name': 'add_page'},
+        {'title': "Обратная связь", 'url_name': 'contact'},
+        {'title': "Войти", 'url_name': 'login'}
+        ]
+
+
+class DataMixin:
+    # Дублируется context, передаваемый в разные шаблоны
+    def get_user_context(self, **kwargs):
+        # создаём словарь именованных параметров, переданных через аргументы функции
+        context = kwargs
+        # формируем список категорий
+        # cats = Category.objects.all()
+
+        # UPD on 26.08.2023 - Lesson 17
+        # Не будем отображать рубрики, в которых нет ни одной статьи
+        # С помощью метода annotate добавляем дополнительный атрибут - количество записей в рубриках
+        cats = Category.objects.annotate(Count('women'))
+
+        # context['menu'] = menu
+
+        # UPD on 26.08.2023 - Lesson 17
+        # Пусть пункт 'Добавить статью' видят только авторизованные пользователи
+        # МНЕ НУЖНО ПРОПИСАТЬ УТОЧНЕНИЕ ДЛЯ МЕНЮ В ПОЛЬЗОВАТЕЛЬСКОМ ТЕГЕ (ДОП.ЗАДАНИЕ ИЗ Lesson 11)
+        user_menu = menu.copy()
+        if not self.request.user.is_authenticated:
+            user_menu.pop(1)
+
+        context['menu'] = user_menu
+
+        # передаём категории в context
+        context['cats'] = cats
+        # Если в kwargs не передаём cat_selected, то переопределяем cat_selected по умолчанию
+        if 'cat_selected' not in context:
+            context['cat_selected'] = 0
+        return context

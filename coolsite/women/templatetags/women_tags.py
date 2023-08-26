@@ -68,9 +68,23 @@ def show_categories(sort=None, cat_selected=""):
 # UPD on 21.08.2023 - Lesson 11
 # ОПРЕДЕЛИМ ПОЛЬЗОВАТЕЛЬСКИЙ ВКЛЮЧЕННЫЙ ТЕГ ДЛЯ ОТОБРАЖЕНИЯ МЕНЮ
 # ШАБЛОН - list_menu.html
+"""
 @register.inclusion_tag('women/list_menu.html')
 def show_menu():
     return {"menu": menu}
+"""
+
+
+# UPD on 26.08.2023 - Lesson 17
+# ПЕРЕОПРЕДЕЛЯЕМ МЕНЮ ДЛЯ НЕЗАРЕГИСТРИРОВАННЫХ ПОЛЬЗОВАТЕЛЕЙ (ИЗ-ЗА ДОП.ЗАДАНИЯ В Lesson 11)
+@register.inclusion_tag('women/list_menu.html', takes_context=True)
+def show_menu(context):
+    request = context['request']
+    user_menu = menu.copy()
+    if not request.user.is_authenticated:
+        user_menu.pop(1)
+
+    return {"menu": user_menu}
 
 
 # UPD on 24.08.2023 - ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ

@@ -45,16 +45,14 @@
   <div class="slider-inner">
     <div class="slides">
 
-		{% for ph in photos %}
-
         <!--
         Можно попробовать использовать картинки (что-то уникальное)
         Если url существует, то выводим фото, если нет - пустую картинку
         -->
 
-      <img src="{{ph.photo.url}}"/>
-
-		{% endfor %}
+        <img src="{{photos.0.photo.url}}"/>
+        <img src="{{photos.1.photo.url}}"/>
+        <img src="{{photos.2.photo.url}}"/>
 
     </div>
   </div>
