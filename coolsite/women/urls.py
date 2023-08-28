@@ -44,7 +44,16 @@ urlpatterns = [
     # path('addpage/', addpage, name='add_page'),
     path('addpage/', AddPage.as_view(), name='add_page'),
     path('contact/', contact, name='contact'),
-    path('login/', login, name='login'),
+    # UPD on 28.08.2023 - Lesson 20
+    # path('login/', login, name='login'),
+    path('login/', LoginUser.as_view(), name='login'),
+    # UPD on 28.08.2023 - Lesson 20
+    # path('logout/', LoginUser.as_view(), name='logout'),
+    path('logout/', logout_user, name='logout'),
+    # UPD on 28.08.2023 - Lesson 19
+    # Используем класс представления RegisterUser
+    # path('register/', login, name='register'),
+    path('register/', RegisterUser.as_view(), name='register'),
     # UPD on 21.08.2023 - Lesson 8
     # Создание динамических url-ссылок на уровне шаблонов
     # Добавляем ссылки на статьи

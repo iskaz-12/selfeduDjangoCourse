@@ -3,6 +3,8 @@
 # Обычно классы форм хранятся в файле forms.py
 
 from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 from .models import *
@@ -109,3 +111,38 @@ class AddPostForm(forms.ModelForm):
             raise ValidationError('Длина превышает 200 символов')
 
         return title
+
+
+# UPD on 28.08.2023 - Lesson 19
+# Создадим свой класс для улучшения внешнего вида формы регистрации (расширим UserCreationForm)
+class RegisterUserForm(UserCreationForm):
+    # Переопределение стандартных полей формы
+    username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
+    # Добавим поле для email
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'form-input'}))
+    password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
+    password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
+
+    class Meta:
+        # Встроенная таблица auth_user из БД
+        model = User
+        # Названия атрибутов можно посмотреть через админ-панель и код элемента
+        # fields = ('username', 'password1', 'password2')
+        fields = ('username', 'email', 'password1', 'password2')
+        """
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-input'}),
+            # Почему-то к полям ввода пароля в форме регистрации стили не применяются, определим их по-другому
+            'password1': forms.PasswordInput(attrs={'class': 'form-input'}),
+            'password2': forms.PasswordInput(attrs={'class': 'form-input'}),
+        }
+        """
+
+
+# UPD on 28.08.2023 - Lesson 20
+# Добавляем класс формы для авторизации (улучшение дизайна формы)
+# Класс Meta как для формы регистрации прописывать не нужно
+# При необходимости можно запрашивать при авторизации и другую информацию: email, имя, фамилию и т.д.
+class LoginUserForm(AuthenticationForm):
+    username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
+    password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))

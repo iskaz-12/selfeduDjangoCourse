@@ -4,8 +4,14 @@ UPD on 21.08.2023 - Lesson 11
 <!--
 ДОПОЛНИТЕЛЬНОЕ ЗАДАНИЕ: ОТОБРАЖЕНИЕ ПУНКТОВ МЕНЮ С ПОМОЩЬЮ ПОЛЬЗОВАТЕЛЬСКОГО ТЕГА
 -->
+<!--
+UPD on 28.08.2023 - Lesson 19
+Добавляем в меню пункт регистрации
+-->
 {% for m in menu %}
-	{% if not forloop.last %}
+<!--
+
+	-->
 				<!--
 				UPD on 21.08.2023 - Lesson 8
 				-->
@@ -13,7 +19,9 @@ UPD on 21.08.2023 - Lesson 11
 				<li><a href="#">{{m.title}}</a></li>
 				-->
 				<li><a href="{% url m.url_name %}">{{m.title}}</a></li>
-	{% else %}
+<!--
+
+	-->
                 <!--
                 # - в данном случае "заглушка"
                 -->
@@ -26,7 +34,26 @@ UPD on 21.08.2023 - Lesson 11
 				<!--
 			<li class="last"><a href="#">{{m.title}}</a></li>
 			-->
+<!--
 				<li class="last"><a href="{% url m.url_name %}">{{m.title}}</a></li>
+-->
+<!--
 
-	{% endif %}
+	-->
 {% endfor %}
+<!--
+UPD on 28.08.2023 - Lesson 19
+Сформируем URl-адреса для регистрации и входа через имена маршрутов
+-->
+<!--
+UPD on 28.08.2023 - Lesson 20
+Показываем другие пункты меню для зарегистрированных пользователей
+НУЖНО ДЛЯ КОРРЕКТНОГО ОТОБРАЖЕНИЯ ПРОПИСАТЬ ДОП. ИЗМЕНЕНИЯ В ПОЛЬЗОВАТЕЛЬСКОМ ВКЛЮЧЕННОМ ТЕГЕ
+Возникает ошибка NoReverseMatch at /login/ (не прописан маршрут logout)
+-->
+{% if request.user.is_authenticated %}
+
+<li class="last"> {{user.username}} | <a href="{% url 'logout' %}">Выйти</a></li>
+{% else %}
+				<li class="last"><a href="{% url 'register' %}">Регистрация</a> | <a href="{% url 'login' %}">Войти</a></li>
+{% endif %}

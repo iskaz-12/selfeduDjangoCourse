@@ -192,3 +192,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # К URL графических файлов будет добавляться префикс media
 MEDIA_URL = '/media/'
+
+# UPD on 28.08.2023 - Lesson 20
+# Определяем спец. константу для перенаправления пользователя после регистрации
+# LOGIN_REDIRECT_URL = '/'

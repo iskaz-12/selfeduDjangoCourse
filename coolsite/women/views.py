@@ -1,4 +1,10 @@
+from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
+# UPD on 28.08.2023 - Lesson 20
+# from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
+# UPD on 28.08.2023 - Lesson 19
+# from django.contrib.auth.forms import UserCreationForm
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -411,8 +417,11 @@ def contact(request):
     return HttpResponse("Обратная связь")
 
 
+# UPD on 28.08.2023 - Lesson 20
+"""
 def login(request):
     return HttpResponse("Авторизация")
+"""
 
 
 # UPD on 17.08.2023 - Lesson 3
@@ -632,3 +641,60 @@ def show_category(request, cat_slug):
 
     return render(request, 'women/index.html', context=context)
 """
+
+
+# UPD on 28.08.2023 - Lesson 19
+# Класс представления для регистрации пользователя
+# Т.к. регистрироваться будем с помощью формы, то родительский класс - CreateView (и DataMixin)
+class RegisterUser(DataMixin, CreateView):
+    # UserCreationForm - встроенная форма для регистрации пользователя
+    # form_class = UserCreationForm
+    # Используем нашу форму RegisterUserForm
+    form_class = RegisterUserForm
+    template_name = 'women/register.html'
+    success_url = reverse_lazy('login')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Регистрация")
+        return dict(list(context.items()) + list(c_def.items()))
+
+    # UPD on 28.08.2023 - Lesson 20
+    # Добавляем метод, авторизующий пользователя при регистрации
+    # Переопределённый метод form_valid вызывается при успешной проверке формы регистрации
+    def form_valid(self, form):
+        # Сохраняем форму, т.е. добавляем пользователя в БД
+        user = form.save()
+        # Встроенная функция авторизации пользователя
+        login(self.request, user)
+        return redirect('home')
+
+
+# UPD on 28.08.2023 - Lesson 20
+# Добавляем класс представления для авторизации пользователей на сайте
+# LoginView - встроенный класс с необходимой логикой для авторизации пользователя
+class LoginUser(DataMixin, LoginView):
+    # AuthenticationForm - стандартная форма для авторизации пользователя
+    # form_class = AuthenticationForm
+    # Указываем нашу форму
+    form_class = LoginUserForm
+    template_name = 'women/login.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Авторизация")
+        return dict(list(context.items()) + list(c_def.items()))
+
+    # Метод, перенаправляющий на другую страницу после прохождения авторизации
+    # (вызывается, если пользователь верно ввёл логин и пароль)
+    # Ссылку для перехода можно указать и в settings.py
+    def get_success_url(self):
+        return reverse_lazy('home')
+
+
+# UPD on 28.08.2023 - Lesson 20
+# Добавляем функцию представления для выхода зарегистрированного пользователя
+def logout_user(request):
+    logout(request)
+    # redirect - перенаправление по маршруту, reverse - формирование маршрута
+    return redirect('login')
