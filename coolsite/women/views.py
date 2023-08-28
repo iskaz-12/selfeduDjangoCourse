@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -27,6 +28,26 @@ menu = [{'title': "О сайте", 'url_name': 'about'},
         {'title': "Обратная связь", 'url_name': 'contact'},
         {'title': "Войти", 'url_name': 'login'}
         ]
+"""
+
+
+# UPD on 27.08.2023 - Lesson 18
+# Постраничная навигация в Django
+"""
+# Примеры рассматриваем с помощью Python Console
+from django.core.paginator import Paginator
+women = ['Анджелина Джоли', 'Дженнифер Лоуренс', 'Джулия Робертс', 'Марго Робби', 'Ума Турман', 'Ариана Гранде', 'Бейонсе', 'Кэтти Перри', 'Рианна', 'Шакира']
+p = Paginator(women, 3) # создание пагинатора
+p.count # число элементов в списке  # 10
+p.num_pages # число страниц (10:3 = 4 – округление до большего)
+p.page_range # итератор для перебора номеров страниц    # range(1, 5)
+p1 = p.page(1) # получение первой страницы
+p1.object_list  # список элементов текущей страницы # ['Анджелина Джоли', 'Дженнифер Лоуренс', 'Джулия Робертс']
+p1.has_next() # имеется ли следующая страница   # True
+p1.has_previous() # имеется ли предыдущая страница  # False
+p1.has_other_pages() # имеются ли вообще страницы   # True (False - случай для единственной страницы)
+p1.next_page_number() # номер следующей страницы    # 2
+p1.previous_page_number() # номер предыдущей страницы   # Возникает ошибка
 """
 
 
@@ -74,6 +95,10 @@ class WomenHome(ListView):
 
 # UPD on 26.08.2023 - Lesson 17
 class WomenHome(DataMixin, ListView):
+    # UPD on 27.08.2023 - Lesson 18
+    # Воспользуемся встроенным в ListView пагинатором
+    # paginate_by = 3
+
     # Выбираем записи из таблицы и пытаемся отобразить в виде списка
     model = Women
     # Меняем шаблон по умолчанию на существующий
@@ -195,7 +220,25 @@ def about(request):
 # нужно использовать специальный декоратор (ошибка 404)
 # @login_required
 def about(request):
+    # UPD on 28.08.2023 - Lesson 18
+    # Пример использования класса Paginator для функций представления
+    # ЧТОБЫ НЕ БЫЛО КНОПОК С НАВИГАЦИЕЙ ПО СТРАНИЦАМ В РАЗДЕЛЕ 'О сайте',
+    # КОММЕНТИРУЕМ СОДЕРЖИМОЕ ДАННОЙ ФУНКЦИИ (ИЗ Lesson 18)
+    """
+    # http://127.0.0.1:8000/about/?page=2 - ссылка для перехода на 2-ю страницу
+    # При указании в page= номера несуществующей страницы - переходим к последней
+    # При указании в page= сочетания букв - переходим к первой
+    contact_list = Women.objects.all()
+    paginator = Paginator(contact_list, 3)
+
+    page_number = request.GET.get('page')
+    # Функция get_page() работает чуть лучше, чем page()
+    page_obj = paginator.get_page(page_number)
+    """
+
+    # UPD on 28.08.2023 - Lesson 18
     return render(request, 'women/about.html', {'menu': menu, 'title': 'О сайте'})
+    # return render(request, 'women/about.html', {'page_obj': page_obj, 'menu': menu, 'title': 'О сайте'})
 
 
 # UPD on 17.08.2023 - Lesson 2
@@ -542,6 +585,11 @@ class WomenCategory(ListView):
 # UPD on 26.08.2023 - Lesson 17
 # Весь общий код классов представлений был вынесен в DataMixin
 class WomenCategory(DataMixin, ListView):
+    # UPD on 28.08.2023 - Lesson 18
+    # Добавляем пагинацию для категорий
+    # Чтобы не было дублирования кода в WomenCategory и WomenHome - перенесём в DataMixin
+    # paginate_by = 3
+
     model = Women
     template_name = 'women/index.html'
     context_object_name = 'posts'

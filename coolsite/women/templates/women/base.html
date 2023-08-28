@@ -130,6 +130,10 @@ UPD on 21.08.2023 - Lesson 11
 	{% endif %}
 {% endfor %}
 -->
+				<!--
+				UPD on 28.08.2023 - Lesson 18
+				Добавим в главное меню пункт регистрации пользователей (в шаблоне list_menu.html)
+				-->
 				{% show_menu %}
 
 			</ul>
@@ -276,6 +280,63 @@ UPD on 21.08.2023 - Lesson 11
 	<div class="content-text">
 {% block content %}
 {% endblock %}
+
+		<!--
+		UPD on 28.08.2023 - Lesson 18
+		Добавляем постраничную навигацию на главной странице
+		Используем базовый шаблон base.html, т.к. нужно ещё добавить пагинацию в категориях
+		Добавляем проверку на то, отображается ли содержимое на нескольких страницах
+		Добавляем кнопки для перехода на предыдущую и следующую страницы
+		-->
+		{% if page_obj.has_other_pages %}
+		<nav class="list-pages">
+    <ul>
+		{% if page_obj.has_previous %}
+<li class="page-num">
+	<!--
+	&lt; - <
+	-->
+         <a href="?page={{ page_obj.previous_page_number }}">&lt;</a>
+</li>
+{% endif %}
+		<!--
+		Класс ListView автоматически передаёт в шаблон 2 параметра:
+		paginator (ссылка на класс Paginator) и page_obj (список объектов для текущей страницы)
+		-->
+        {% for p in paginator.page_range %}
+		<!--
+		Отображаем текущую страницу как текст, а не как ссылку
+		-->
+		{% if page_obj.number == p %}
+        <li class="page-num page-num-selected">{{ p }}</li>
+		<!--
+		Пусть отображается 2 ближайшие слева и 2 ближайшие справа страницы от текущей
+		add - фильтр суммирования
+		-->
+		<!--
+
+                   -->
+		{% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+        <li class="page-num">
+            <a href="?page={{ p }}">{{ p }}</a>
+        </li>
+		{% endif %}
+
+        {% endfor %}
+
+				{% if page_obj.has_next %}
+<li class="page-num">
+	<!--
+	&gt; - >
+	-->
+         <a href="?page={{ page_obj.next_page_number }}">&gt;</a>
+</li>
+{% endif %}
+
+    </ul>
+</nav>
+{% endif %}
+
 	</div>
 <!-- Конец блока контента -->
 

@@ -41,5 +41,42 @@ UPD on 19.08.2023 - Lesson 6
 
 {% block content %}
 <h1>{{title}}</h1>
+
+<!--
+UPD on 28.08.2023 - Lesson 18
+Постраничное отображение данных на странице 'О сайте'
+Возвращаем прежний вариант
+-->
+<!--
 <p>Содержимое страницы о сайте
+-->
+<!--
+{% for contact in page_obj %}
+<p>{{ contact }}</p>
+{% endfor %}
+-->
+<!--
+UPD on 28.08.2023 - Lesson 18
+Добавляем список ссылок
+-->
+<!--
+<nav> - навигация по сайту
+-->
+<!--
+<nav>
+    <ul>
+    -->
+        <!--
+        page_obj.paginator.page_range - возвращает итератор номеров страниц
+        -->
+<!--
+        {% for p in page_obj.paginator.page_range %}
+        <li>
+            <a href="?page={{ p }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</nav>
+-->
+
 {% endblock %}

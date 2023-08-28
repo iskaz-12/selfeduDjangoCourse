@@ -520,6 +520,10 @@ class Women(models.Model):
         # UPD on 23.08.2023 - Lesson 16
         # ИСПРАВЛЕНИЕ ОШИБКИ НАСЧЁТ ФУНКЦИИ annotate() ПО ПРИМЕРУ В УРОКЕ
         # ordering = ['-time_create', 'title']
+        # UPD on 28.08.2023 - Lesson 18
+        # В УРОКЕ ПОЯВЛЯЕТСЯ ОШИБКА UnorderedObjectListWarning (У МЕНЯ ТАКОЙ НЕТ),
+        # НО ВСЁ РАВНО ДОБАВЛЮ УПОРЯДОЧИВАНИЕ ПО id
+        ordering = ['id']
 
 
 # UPD on 21.08.2023 - Lesson 9
