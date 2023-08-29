@@ -140,8 +140,10 @@ class WomenHome(DataMixin, ListView):
     # prefetch_related(key) – "жадная" загрузка связанных данных по внешнему ключу key,
     # который имеет тип ManyToManyField.
     # Добавляем одновременную загрузку связанных с женщинами категорий по внешнему ключу (cat - согласно модели Women)
+    # ОПТИМИЗИРУЮ ЗАПРОСЫ ДЛЯ СВОЕГО ВАРИАНТА САЙТА
     def get_queryset(self):
-        return Women.objects.filter(is_published=True).select_related('cat')
+        # return Women.objects.filter(is_published=True).select_related('cat')
+        return Women.objects.filter(is_published=True).select_related('cat', 'first_photo')
 
 
 # Create your views here.
@@ -631,8 +633,11 @@ class WomenCategory(DataMixin, ListView):
     # SELECT ••• FROM "women_women" INNER JOIN "women_category" ON ("women_women"."cat_id" = "women_category"."id")
     # WHERE ("women_category"."slug" = '''aktrisy''' AND "women_women"."is_published")
     # ORDER BY "women_women"."id" ASC LIMIT 1
+    # ОПТИМИЗИРУЮ ЗАПРОСЫ ДЛЯ СВОЕГО ВАРИАНТА САЙТА
     def get_queryset(self):
-        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True).select_related('cat')
+        # return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True).select_related('cat')
+        return (Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
+                .select_related('cat', 'first_photo'))
 
     # Добавляем получение контекста (для отображения заголовка вкладки, установления категорий без ссылок)
     # (ИЗ-ЗА ДОП. ЗАДАНИЯ В Lesson 11 МЕНЮ ОТОБРАЖАЕТСЯ ВЕРНО, НО ПРОДЕЛАЕМ АНАЛОГИЧНЫЕ ДЕЙСТВИЯ, КАК В Lesson 15)

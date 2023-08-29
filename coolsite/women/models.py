@@ -345,8 +345,16 @@ class Women(models.Model):
     # UPD on 23.08.2023 - Lesson 16
     # Можно переименовать свойство women_set на другое
     cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name="Категории")
-
     # cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name="Категории", related_name='get_posts')
+
+    # UPD on 29.08.2023 - Lesson 21
+    # ОПТИМИЗАЦИЯ ЗАПРОСОВ В МОЁМ ВАРИАНТЕ САЙТА
+    # ВВОЖУ ДОПОЛНИТЕЛЬНОЕ ПОЛЕ - ВНЕШНИЙ КЛЮЧ ДЛЯ ПЕРВОГО ФОТО
+    # related_name="+" - УБИРАЕТ ОШИБКУ С ОБРАТНЫМ ОТНОШЕНИЕМ
+    # python manage.py makemigrations
+    # python manage.py migrate
+    # ЗАПОЛНИМ ЭТО ПОЛЕ ЧЕРЕЗ АДМИН-ПАНЕЛЬ
+    first_photo = models.ForeignKey('WomenPhoto', null=True, on_delete=models.PROTECT, verbose_name="Фотография", related_name="+")
 
     # UPD on 17.08.2023 - Lesson 4
     # Чтобы создать таблицу в БД нужно создать и выполнить миграции

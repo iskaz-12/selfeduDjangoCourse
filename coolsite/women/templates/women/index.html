@@ -127,7 +127,45 @@ UPD on 21.08.2023 - Lesson 10
 				Попробуем проверять наличие хотя бы одной фотографии
 				Переносим отображение фото в отдельный шаблон
 				-->
-				{% show_photos women_id=p.pk cat_selected=cat_selected %}
+				<!--
+				UPD on 29.08.2023 - Lesson 21
+				ПРОБУЮ ОПТИМИЗИРОВАТЬ СОБСТВЕННЫЕ SQL-ЗАПРОСЫ
+				ФОТОГРАФИИ НА ГЛАВНОЙ СТРАНИЦЕ И В КАТЕГОРИЯХ ОТОБРАЖАЕМ БЕЗ ИСПОЛЬЗОВАНИЯ ВКЛЮЧЕННОГО ТЕГА
+				-->
+				<!--
+
+				-->
+
+
+{% if p.first_photo != None %}
+
+<!--
+UPD on 29.08.2023 - Lesson 21
+ДОПОЛНИТЕЛЬНО ОПТИМИЗИРУЮ ЗАПРОСЫ ИЗ-ЗА ДОП.ЗАДАНИЯ ПО ДОБАВЛЕНИЮ НЕСКОЛЬКИХ ФОТО К ОДНОЙ ЗАПИСИ
+-->
+<!--
+
+-->
+<p><img class="img-article-left thumb" src="{{p.first_photo.photo.url}}"></p>
+
+				{% else %}
+
+                {% if cat_selected == 0 %}
+
+				<p><img class="img-article-left thumb" src="../static/women/images/no_photo.png"></p>
+
+                {% else %}
+
+                <p><img class="img-article-left thumb" src="../../../static/women/images/no_photo.png"></p>
+
+                {% endif %}
+
+<!--
+<p><div class="empty-photo-img"></div></p>
+-->
+
+{% endif %}
+
 
 
 

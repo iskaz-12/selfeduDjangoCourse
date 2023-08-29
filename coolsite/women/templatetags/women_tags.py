@@ -112,9 +112,7 @@ def show_photos(women_id=0, cat_selected=0):
 
     # UPD on 29.08.2023 - Lesson 21
     # ДОПОЛНИТЕЛЬНО ОПТИМИЗИРУЮ ЗАПРОСЫ ИЗ-ЗА ДОП.ЗАДАНИЯ ПО ДОБАВЛЕНИЮ НЕСКОЛЬКИХ ФОТО К ОДНОЙ ЗАПИСИ
-    # ДОДЕЛАТЬ!!!
-    # photos = WomenPhoto.objects.filter(women_id=women_id).first()
-    # photos_count = photos.count()
+    # ДЛЯ ЭТОГО ПРИДЁТСЯ ИЗМЕНИТЬ ТАБЛИЦУ women В БД - ДОБАВИТЬ ПОЛЕ - ВНЕШНИЙ КЛЮЧ К ПЕРВОМУ ФОТО
 
     return {"photos": photos, "cat_selected": cat_selected}
 
