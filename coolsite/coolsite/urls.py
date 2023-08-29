@@ -50,6 +50,24 @@ urlpatterns = [
 # и передачи их приложению
 # На реальных серверах, как правило, данный процесс уже настроен
 if settings.DEBUG:
+    # UPD on 28.08.2023 - Lesson 21
+    # Добавляем нужный пакет (вне DEBUG не будет работать)
+    import debug_toolbar
+
+    # UPD on 28.08.2023 - Lesson 21
+    # НЕ ОТОБРАЖАЛСЯ Django Debug Toolbar, ПРОБЛЕМУ РЕШАЛА В СООТВЕТСТВИИ С КОММЕНТАРИЕМ К ДАННОМУ УРОКУ
+    # (ВНОСИЛА ИЗМЕНЕНИЯ В РЕДАКТОРЕ РЕЕСТРА для .js)
+    # https://www.youtube.com/watch?v=qnJ8FJf9RGA&lc=UgyN7C0bNQGUi5kZDnR4AaABAg
+
+    # UPD on 28.08.2023 - Lesson 21
+    # В Debug Toolbar можем просмотреть следующую информацию: версию Django, время формирования страницы,
+    # количество выполненных SQL-запросов, список используемых шаблонов и так далее.
+
+    # Прописываем пути для Django Debug Toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
+
     # Добавляем маршрут к графическим загруженным файлам (чтобы веб-сервер находил их и отображал на html-странице)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

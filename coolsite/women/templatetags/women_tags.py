@@ -109,6 +109,13 @@ def show_menu(context):
 @register.inclusion_tag('women/photo.html')
 def show_photos(women_id=0, cat_selected=0):
     photos = WomenPhoto.objects.filter(women_id=women_id)
+
+    # UPD on 29.08.2023 - Lesson 21
+    # ДОПОЛНИТЕЛЬНО ОПТИМИЗИРУЮ ЗАПРОСЫ ИЗ-ЗА ДОП.ЗАДАНИЯ ПО ДОБАВЛЕНИЮ НЕСКОЛЬКИХ ФОТО К ОДНОЙ ЗАПИСИ
+    # ДОДЕЛАТЬ!!!
+    # photos = WomenPhoto.objects.filter(women_id=women_id).first()
+    # photos_count = photos.count()
+
     return {"photos": photos, "cat_selected": cat_selected}
 
 

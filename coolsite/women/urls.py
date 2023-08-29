@@ -6,7 +6,7 @@ from django.urls import path, re_path
 from .views import *
 
 # UPD on 17.08.2023 - Lesson 3
-'''
+"""
 urlpatterns = [
     # path('', index),    # https://127.0.0.1:8000/
 
@@ -25,7 +25,7 @@ urlpatterns = [
     # (?P<...>) - синтаксис именованной группы (year - именованный параметр для части шаблона)
     re_path(r'^archive/(?P<year>[0-9]{4})/', archive),
 ]
-'''
+"""
 
 # UPD on 19.08.2023 - Lesson 6
 # Меняем url-адреса
@@ -76,3 +76,19 @@ urlpatterns = [
     # path('category/<slug:cat_slug>/', show_category, name='category'),
     path('category/<slug:cat_slug>/', WomenCategory.as_view(), name='category'),
 ]
+
+
+# UPD on 28.08.2023 - Lesson 21
+# Оптимизация сайта с Django Debug Toolbar
+"""
+# Чтобы определить, насколько хорошо работает приложение, нужно оценивать:
+# скорость работы приложения;
+# нагрузку на СУБД (частоту и сложность запросов);
+# корректность возвращаемых пользователю данных.
+# Установим в виртуальное окружение Django Debug Toolbar
+# pip install django-debug-toolbar
+# Осталось настроить данный пакет применительно к сайту
+# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
+# Во вкладке SQL в Django Debug Toolbar видно, что часть запросов выполняется дважды - это не очень хорошо
+# Попробуем это исправить
+"""

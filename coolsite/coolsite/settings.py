@@ -48,6 +48,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # UPD on 28.08.2023 - Lesson 21
+    # Устанавливаем Django Debug Toolbar
+    'debug_toolbar',
+
     # UPD on 16.08.2023 - Lesson 2
     # Создание и регистрация приложения 'women'
     # допустимый, но неоптимальный вариант
@@ -60,8 +64,6 @@ INSTALLED_APPS = [
     # в settings.py приложение зарегистрировано с использованием WomenConfig
     # ДОПОЛНИТЕЛЬНО НУЖНО В apps.py В WomenConfig УСТАНОВИТЬ ФЛАГ default = False
     # 'women',
-
-
 ]
 
 MIDDLEWARE = [
@@ -72,6 +74,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # UPD on 28.08.2023 - Lesson 21
+    # Устанавливаем Django Debug Toolbar
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'coolsite.urls'
@@ -196,3 +202,10 @@ MEDIA_URL = '/media/'
 # UPD on 28.08.2023 - Lesson 20
 # Определяем спец. константу для перенаправления пользователя после регистрации
 # LOGIN_REDIRECT_URL = '/'
+
+# UPD on 28.08.2023 - Lesson 21
+# Устанавливаем Django Debug Toolbar
+# Указываем IPs, с которыми будет работать Django Debug Toolbar
+INTERNAL_IPS = [
+    '127.0.0.1',
+]

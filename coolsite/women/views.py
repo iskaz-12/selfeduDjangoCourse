@@ -127,8 +127,21 @@ class WomenHome(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
     # Будем показывать на главной странице только те записи, у которых is_published=True
+    """
     def get_queryset(self):
         return Women.objects.filter(is_published=True)
+    """
+
+    # UPD on 29.08.2023 - Lesson 21
+    # Ленивые запросы (выполняющиеся в момент непосредственного обращения к данным)
+    # хорошо использовать в случае единичного обращения к БД
+    # Нужно сделать загрузку категорий и постов одним запросом. Для этого в Django имеются два полезных метода:
+    # select_related(key) – "жадная" загрузка связанных данных по внешнему ключу key, который имеет тип ForeignKey;
+    # prefetch_related(key) – "жадная" загрузка связанных данных по внешнему ключу key,
+    # который имеет тип ManyToManyField.
+    # Добавляем одновременную загрузку связанных с женщинами категорий по внешнему ключу (cat - согласно модели Women)
+    def get_queryset(self):
+        return Women.objects.filter(is_published=True).select_related('cat')
 
 
 # Create your views here.
@@ -253,7 +266,7 @@ def about(request):
 # Добавление возможности обработки числового параметра из запроса в представление
 # <p> - тег абзаца
 # Префикс f - динамическая строка
-'''
+"""
 # Параметр request функции представления используется для обработки GET-запросов
 # Словарь request.GET сохраняет параметры из GET-запроса
 def categories(request, catid):
@@ -296,7 +309,8 @@ def archive(request, year):
         return redirect('home', permanent=False)
 
     return HttpResponse(f"<h1>Архив по годам</h1><p>{year}</p>")
-'''
+"""
+
 
 # UPD on 21.08.2023 - Lesson 8
 # Добавляем функции представления для пунктов меню сайта
@@ -518,10 +532,10 @@ def show_post(request, post_slug):
 
 # UPD on 21.08.2023 - Lesson 9
 # Функция-заглушка (пока) для конкретной категории статей сайта
-'''
+"""
 def show_category(request, cat_id):
     return HttpResponse(f"Отображение категории с id = {cat_id}")
-'''
+"""
 
 # UPD on 21.08.2023 - Lesson 9
 # Меняем функцию для отображения категорий
@@ -606,16 +620,39 @@ class WomenCategory(DataMixin, ListView):
     # Отображается Page not found (404)
     allow_empty = False
 
+    """
     def get_queryset(self):
         return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
+    """
+
+    # UPD on 29.08.2023 - Lesson 21
+    # Добавляем "жадную" загрузку категорий
+    # Дублируется запрос вида:
+    # SELECT ••• FROM "women_women" INNER JOIN "women_category" ON ("women_women"."cat_id" = "women_category"."id")
+    # WHERE ("women_category"."slug" = '''aktrisy''' AND "women_women"."is_published")
+    # ORDER BY "women_women"."id" ASC LIMIT 1
+    def get_queryset(self):
+        return Women.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True).select_related('cat')
 
     # Добавляем получение контекста (для отображения заголовка вкладки, установления категорий без ссылок)
     # (ИЗ-ЗА ДОП. ЗАДАНИЯ В Lesson 11 МЕНЮ ОТОБРАЖАЕТСЯ ВЕРНО, НО ПРОДЕЛАЕМ АНАЛОГИЧНЫЕ ДЕЙСТВИЯ, КАК В Lesson 15)
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         # UPD on 26.08.2023 - Lesson 17
+        # UPD on 29.08.2023 - Lesson 21
+        # Попробуем уменьшить количество запросов
+        # Причина действительно в отображении названия вкладки и получении id текущей категории
+        # Оптимизируем этот момент
+        # ТАКЖЕ ДОПОЛНИТЕЛЬНО ПОПРОБУЮ ОПТИМИЗИРОВАТЬ ЗАПРОСЫ, СВЯЗАННЫЕ С ЗАГРУЗКОЙ ФОТОГРАФИЙ
+        c = Category.objects.get(slug=self.kwargs['cat_slug'])
+        """
         c_def = self.get_user_context(title='Категория - ' + str(context['posts'][0].cat),
                                       cat_selected=context['posts'][0].cat_id)
+        """
+        c_def = self.get_user_context(title='Категория - ' + str(c.name),
+                                      cat_selected=c.pk)
+        # c_def = self.get_user_context(title="Главная страница")
+
         return dict(list(context.items()) + list(c_def.items()))
 
 
