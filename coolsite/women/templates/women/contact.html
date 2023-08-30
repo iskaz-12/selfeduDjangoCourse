@@ -1,0 +1,27 @@
+<!--
+UPD on 29.08.2023 - Lesson 23
+Создаём шаблон для формы обратной связи
+-->
+{% extends 'women/base.html' %}
+ 
+{% block content %}
+<h1>{{title}}</h1>
+ 
+<form method="post">
+    {% csrf_token %}
+ 
+    <div class="form-error">{{ form.non_field_errors }}</div>
+ 
+{% for f in form %}
+    <!--
+    f.id_for_label - вручную создаём id для поля f
+    -->
+<p><label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
+<div class="form-error">{{ f.errors }}</div>
+{% endfor %}
+ 
+    <button type="submit">Отправить</button>
+ 
+</form>
+ 
+<p>{% endblock %}

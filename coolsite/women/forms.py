@@ -6,6 +6,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+# UPD on 30.08.2023 - Lesson 23
+# Импортируем CaptchaField в проект
+from captcha.fields import CaptchaField
 
 from .models import *
 
@@ -146,3 +149,31 @@ class RegisterUserForm(UserCreationForm):
 class LoginUserForm(AuthenticationForm):
     username = forms.CharField(label='Логин', widget=forms.TextInput(attrs={'class': 'form-input'}))
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
+
+
+# UPD on 29.08.2023 - Lesson 23
+# Класс, определяющий форму обратной связи (наследуется от общего класса формы Form)
+class ContactForm(forms.Form):
+    name = forms.CharField(label='Имя', max_length=255)
+    email = forms.EmailField(label='Email')
+    content = forms.CharField(widget=forms.Textarea(attrs={'cols': 60, 'rows': 10}))
+
+    # UPD on 30.08.2023 - Lesson 23
+    # Подключаем captcha в форму
+    # Проверим, как это работает
+    # Отображение captcha на сайте можно менять с помощью спец. настроек
+    # Существуют параметры CAPTCHA_FONT_PATH, CAPTCHA_FONT_SIZE, CAPTCHA_IMAGE_SIZE и т.д.
+    # Подробнее по ссылке:
+    # https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
+    captcha = CaptchaField()
+
+
+# UPD on 30.08.2023 - Lesson 23
+"""
+# Подключим django-simple-captcha
+# pip install django-simple-captcha
+# Настроим captcha для текущего проекта
+# django-simple-captcha использует свою таблицу в БД, поэтому нужно выполнить миграцию
+# python manage.py migrate
+# Далее нужно подключить путь к captcha в urls.py пакета конфигураций
+"""

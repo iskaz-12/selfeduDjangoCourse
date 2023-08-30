@@ -27,6 +27,10 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    # UPD on 30.08.2023 - Lesson 23
+    # Добавляем путь к captcha
+    path('captcha/', include('captcha.urls')),
+
     # UPD on 16.08.2023 - Lesson 2
     # Связывание функции представления с url-адресом
     # Аргументы функции path: шаблон, ссылка на функцию представления, активизирующейся на указанный запрос

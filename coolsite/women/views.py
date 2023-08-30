@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 # UPD on 23.08.2023 - Lesson 15
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, FormView
 # UPD on 26.08.2023 - Lesson 17
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -429,8 +429,31 @@ def addpage(request):
 """
 
 
+# UPD on 29.08.2023 - Lesson 23
+# Пропишем класс представления для страницы обратной связи
+"""
 def contact(request):
     return HttpResponse("Обратная связь")
+"""
+
+
+# FormView - стандартный класс для форм, не связанных с моделью (не работающих с БД)
+class ContactFormView(DataMixin, FormView):
+    form_class = ContactForm
+    template_name = 'women/contact.html'
+    success_url = reverse_lazy('home')
+
+    # Уже известная функция, формирующая контекст для шаблона
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Обратная связь")
+        return dict(list(context.items()) + list(c_def.items()))
+
+    # Метод form_valid вызывается, если пользователь верно заполнил все поля контактной формы
+    def form_valid(self, form):
+        # Выводим в консоль "чистые" данные из формы
+        print(form.cleaned_data)
+        return redirect('home')
 
 
 # UPD on 28.08.2023 - Lesson 20

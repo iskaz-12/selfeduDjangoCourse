@@ -52,6 +52,10 @@ INSTALLED_APPS = [
     # Устанавливаем Django Debug Toolbar
     'debug_toolbar',
 
+    # UPD on 30.08.2023 - Lesson 23
+    # Устанавливаем django-simple-captcha
+    'captcha',
+
     # UPD on 16.08.2023 - Lesson 2
     # Создание и регистрация приложения 'women'
     # допустимый, но неоптимальный вариант
@@ -209,3 +213,14 @@ MEDIA_URL = '/media/'
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+# UPD on 29.08.2023 - Lesson 22
+# Настраиваем кэширование на уровне файловой системы
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        # 'LOCATION': 'c:/foo/bar',
+        # Определим путь к корневой папке кэша
+        'LOCATION': os.path.join(BASE_DIR, 'coolsite_cache'),
+    }
+}
