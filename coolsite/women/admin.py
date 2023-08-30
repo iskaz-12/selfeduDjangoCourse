@@ -77,3 +77,19 @@ admin.site.register(WomenPhoto, WomenPhotoAdmin)
 # admin.site.register(Women)
 admin.site.register(Women, WomenAdmin)
 admin.site.register(Category, CategoryAdmin)
+
+
+# UPD on 30.08.2023 - Lesson 24
+# Настройка админ-панели
+"""
+# Попробуем изменить стиль оформления админ-панели
+# С помощью Django Debug Toolbar смотрим, какие шаблоны используются при формировании админ-панели
+# Пример пути: C:\\RMR Digital Technologies\\Django Tutorial\\selfedu Youtube Course\\lesson1_site\\lesson1_venv\\
+# Lib\\site-packages\\django\\contrib\\admin\\templates\\admin\\base_site.html
+# Могли бы внести изменения во встроенный шаблон base_site.html, но это не лучшая практика,
+# все создающиеся при установке Django шаблоны лучше оставлять без изменений
+# Переопределять нужно непосредственно в нашем проекте
+# Создаём в корне проекта coolsite папку templates, а в ней - подкаталог admin
+# Если в coolsite/admin разместить файл base_site.html, то он будет переопределять встроенный в Django файл 
+# (т.к. Django будет искать шаблоны сначала в нестандартных подкаталогах, а затем - в каталогах приложений)
+"""

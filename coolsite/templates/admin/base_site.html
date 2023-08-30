@@ -1,0 +1,46 @@
+<!--
+UPD on 30.08.2023 - Lesson 24
+Изменение стиля админ-панели
+Если оставить такое содержимое файла, то ничего не изменится (используются те же шаблоны)
+Чтобы использовался новый шаблон, нужно прописать нестандартный путь к данному файлу в settings.py в TEMPLATES
+Видим пустую страницу, добавляем в данный файл содержимое стандартного шаблона
+Видим, что теперь используется наш шаблон:
+C:\\RMR Digital Technologies\\Django Tutorial\\selfedu Youtube Course\\lesson1_site\\coolsite\\templates\\admin\\base_site.html
+Посмотрим, за что отвечают некоторые элементы шаблона
+Попробуем добавить собственные стили, для этого откроем встроенный шаблон более высокого уровня base.html
+Для этого нужно использовать block extrastyle (подключаем через него таблицу стилей)
+Должны через тег загрузить файлы static
+-->
+<!--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html>
+-->
+{% extends "admin/base.html" %}
+
+{% load static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+<!--
+<h1 id="site-name"><a href="{% url 'admin:index' %}">1111</a></h1>
+-->
+{% if user.is_anonymous %}
+  {% include "admin/color_theme_toggle.html" %}
+{% endif %}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
