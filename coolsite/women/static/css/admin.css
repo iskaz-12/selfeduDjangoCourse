@@ -1,0 +1,12 @@
+/*
+UPD on 31.08.2023 - Lesson 24
+Создаём файл стилей для админ-панели
+#header - селектор
+.module caption - селектор
+*/
+/*
+#header {
+*/
+#header, .module caption {
+    background: #5e3a00;
+}

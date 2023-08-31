@@ -627,6 +627,9 @@ class WomenPhoto(models.Model):
     class Meta:
         verbose_name = 'Фотография известной женщины'
         verbose_name_plural = 'Фотографии известных женщин'
+        # UPD on 31.08.2023 - Lesson 24
+        # ДЛЯ УДОБСТВА ДОБАВИМ ДЛЯ МОДЕЛИ WomenPhoto сортировку по id
+        ordering = ['id']
 
 
 # UPD on 21.08.2023 - Lesson 9
